@@ -8,6 +8,7 @@ export default defineConfig({
   lastUpdated: true,
   themeConfig: {
     siteTitle: "Axiom",
+    logo: '/logo.svg',
     nav: [
       { text: "首页", link: "/" },
       { text: "快速开始", link: "/guide/quickstart" },

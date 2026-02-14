@@ -1,0 +1,18 @@
+---
+description: 技能路由表 (Skill Router)
+---
+# Skill Router (v4.2)
+> 根据任务类型调用对应能力。
+
+| 任务类型 | 调用技能 (Skill Name) | 位置 |
+| :--- | :--- | :--- |
+| **需求分析 (Gate)** | `requirement-analyst` | `.agent/skills/` |
+| **产品设计 (Draft)** | `product-design-expert` | `.agent/skills/` |
+| **评审仲裁 (Review)** | `review-aggregator` | `.agent/skills/` |
+| **系统架构 (Manifest)** | `system-architect` | `.agent/skills/` |
+| **读写记忆** | `context-manager` | `.agent/skills/` |
+| **错误分析** | `exception-guardian` | `.gemini/antigravity/skills/` |
+| **UI/UX 设计** | `ui-ux-pro-max` | `.gemini/antigravity/skills/` |
+| **飞书文档** | `feishu-doc-assistant` | `.gemini/antigravity/skills/` |
+| **自进化** | `evolution-engine` | `.agent/skills/` |
+| **代码生成** | `worker-engine` (按 ACTIVE_PROVIDER 路由) | (Built-in / Native) |

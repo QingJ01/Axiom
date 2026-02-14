@@ -1,0 +1,37 @@
+---
+description: Provider 路由规则 (多 CLI Worker)
+version: 1.0
+updated: 2026-02-14
+---
+
+# Provider Router
+
+在所有需要启动 Worker CLI 的流程中，先读取 `.agent/config/agent_config.md` 的 `ACTIVE_PROVIDER`，再按下表构造命令。
+
+## 1) Provider -> Worker 命令模板
+
+| ACTIVE_PROVIDER | Worker CLI | EXEC_TEMPLATE | 说明 |
+| :--- | :--- | :--- | :--- |
+| `codex` | Codex CLI | `codex exec "{PROMPT}"` | 默认首选 |
+| `claude_code` | Claude Code | `claude "{PROMPT}"` | 按本机安装命令名 |
+| `opencode` | OpenCode CLI | `opencode run "{PROMPT}"` | 以当前 CLI 语法为准 |
+| `gemini_cli` | Gemini CLI | `gemini "{PROMPT}"` | 以当前 CLI 语法为准 |
+| `gemini` | Gemini (legacy) | `codex exec "{PROMPT}"` | 向后兼容 |
+| `claude` | Claude (legacy) | `codex exec "{PROMPT}"` | 向后兼容 |
+| `copilot` | Copilot (legacy) | `codex exec "{PROMPT}"` | 向后兼容 |
+
+## 2) 统一占位符
+
+- `WORKER_EXEC`: 当前 Provider 的执行命令模板。
+- `WORKER_LABEL`: 当前 Provider 的展示名。
+
+## 3) 回退策略
+
+1. 若 `ACTIVE_PROVIDER` 不存在或未命中，回退 `codex`。
+2. 若目标 CLI 未安装，输出缺失提示并给出安装命令。
+3. 仅在当前 Provider 无法执行时，回退到 `codex exec`。
+
+## 4) 约束
+
+- 不在 workflow 中硬编码 `codex exec`。
+- workflow 仅引用 `WORKER_EXEC`。

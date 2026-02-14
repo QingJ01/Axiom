@@ -1,0 +1,35 @@
+name: "Initialization"
+description: "交互式初始化 Axiom 环境适配器"
+steps:
+  - name: "环境问询"
+    type: "ask_user"
+    message: "欢迎使用 Axiom v4.2！请选择您的 AI 助手：\n1. GitHub Copilot\n2. Cursor AI\n3. Gemini\n4. Axiom CLI"
+    options: ["copilot", "cursor", "gemini", "antigravity"]
+
+  - name: "风险确认"
+    type: "ask_user"
+    message: "即将覆盖配置文件。是否继续？(系统将自动创建 .bak 备份)"
+    options: ["yes", "no"]
+
+  - name: "配置部署"
+    type: "script"
+    run: |
+      if selection == "copilot":
+        ensure_dir(".github")
+        backup(".github/copilot-instructions.md")
+        copy(".agent/adapters/copilot/COPILOT.md", ".github/copilot-instructions.md")
+      elif selection == "cursor":
+        backup(".cursorrules")
+        copy(".agent/adapters/cursor/.cursorrules", ".cursorrules")
+      elif selection == "gemini":
+        ensure_dir("~/.gemini")
+        backup("~/.gemini/GEMINI.md")
+        copy(".agent/adapters/gemini/GEMINI.md", "~/.gemini/GEMINI.md")
+
+  - name: "新手引导"
+    message: |
+      ✅ 初始化完成！
+      试一试：
+      - /draft [需求]
+      - /status
+      📖 更多文档见 README.md

@@ -1,0 +1,29 @@
+---
+description: 核心门禁规则 (Gatekeepers)
+---
+# Security & Quality Gates (v4.2)
+> 强制性检查点，未通过则绝对禁止进入下一环节。
+
+## 1. 专家评审门禁 (Expert Gate)
+- **触发**: 所有新功能需求 / Phase 1 结束。
+- **动作**: 必须经过 `ai-review` 流程（含 Gatekeeper, Parallel Review, Arbitration）。
+- **通过条件**: Aggregator 生成 `review_summary.md` 并结论为 "Pass"。
+
+## 2. PRD 确认门禁 (User Gate)
+- **触发**: PRD 终稿生成完成。
+- **动作**: 显示 "PRD 已生成，是否确认执行？(Yes/No)"。
+- **恢复**: 用户明确确认后才允许进入分解阶段 `/decompose`。
+
+## 3. 复杂度门禁 (Complexity Gate)
+- **触发**: 开发前评估工时 > 1 人日。
+- **动作**: 必须触发 `prd-decomposition` 进行任务拆解。
+
+## 4. 编译提交门禁 (CI Gate)
+- **触发**: 代码修改完成。
+- **动作**: 必须执行 `flutter analyze` + `flutter test`。
+- **通过条件**: 无错误时自动执行 `git commit`。
+
+## 5. 范围门禁 (Scope Gate)
+- **触发**: 修改文件时。
+- **检查**: 是否在 `manifest.md` 定义的 `Impact Scope` 内。
+- **动作**: 越界修改触发警告。

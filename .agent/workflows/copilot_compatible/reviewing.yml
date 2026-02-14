@@ -1,0 +1,33 @@
+name: "Phase 1.5: 专家评审"
+description: "通过5位专家视角并行评审并生成飞书汇报。"
+prerequisites:
+  - "docs/prd/${{ name }}-draft.md"
+steps:
+  - name: "专家并行评审"
+    type: "parallel"
+    tasks:
+      - run: "codex exec --role ux_director --input draft.md"
+      - run: "codex exec --role product_director --input draft.md"
+      - run: "codex exec --role domain_expert --input draft.md"
+      - run: "codex exec --role tech_lead --input draft.md"
+      - run: "codex exec --role critic --input draft.md"
+    wait_for_all: true
+
+  - name: "汇总与同步"
+    uses: "review-aggregator"
+    with:
+      inputs: ["review_*.md", "draft.md"]
+    actions:
+      - "解决冲突 (Safety > Tech > Strategy)"
+      - "生成 docs/prd/${{ name }}-rough.md"
+      - "创建飞书文档"
+    output: "${{ feishu_link }}"
+
+  - name: "用户确认门禁"
+    type: "gate"
+    message: "专家评审已完成。飞书文档：${{ feishu_link }}。是否进入任务拆解？"
+    options:
+      - label: "是 (继续)"
+        run: "workflow: decomposing"
+      - label: "否 (停止)"
+        run: "stop"

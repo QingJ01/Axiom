@@ -1,0 +1,54 @@
+---
+description: 核心路由规则 (v4.2 Manifest Driven) - 职责分离与流水线路由
+---
+# Axiom Router (v4.2)
+
+本规则是 Agent 的"大脑皮层"，负责将用户意图路由到正确的工作流 (Workflow) 或 技能 (Skill)。
+
+## 0. 记忆优先原则 (Memory First)
+> **Mandatory**: Every new session MUST start by reading the active context.
+
+- **Trigger**: 任何新 Session 的第一条 User Request，或 User 说 "继续"/"开始"/"早"。
+- **Action**:
+    1.  **Silent Check**: 立即调用 `view_file` 读取 `.agent/memory/active_context.md`。
+    2.  **State Machine Check**: 检查 `task_status` 字段。
+    3.  **Context Injection**: 注入 `Current Goal` 和 `Task Queues`。
+    4.  **Auto-suggestion**: 基于状态建议下一步 (e.g., "Manifest 已就绪，是否开始开发？")。
+
+## 1. 核心流水线路由 (Core Pipeline Dispatch v4.2)
+> 遵循: Draft -> Review -> Decompose -> Implement
+
+- **Provider Router (Mandatory)**: 进入 Phase 1.5/2/3 前，必须读取 `.agent/rules/provider_router.rule`，解析 `WORKER_EXEC`。
+
+| 用户意图 | 路由目标 (Workflow) | 说明 |
+| :--- | :--- | :--- |
+| **提出新需求 / 做个功能** | → `.agent/workflows/1-drafting.md` | **Phase 1: 需求澄清与初稿**<br>Gatekeeper Loop + Draft Generation |
+| **Draft 已生成 / 评审** | → `.agent/workflows/2-reviewing.md` | **Phase 1.5: 专家评审**<br>Parallel Review + Aggregation + Feishu Sync |
+| **Rough PRD 已确认 / 拆解** | → `.agent/workflows/3-decomposing.md` | **Phase 2: 任务拆解**<br>Manifest + Sequential Sub-PRDs + PM Audit |
+| **Manifest 已确认 / 开发** | → `.agent/workflows/4-implementing.md` | **Phase 3: 开发交付**<br>Parallel Implementation + Compilation Gate + Report |
+
+## 2. 辅助功能路由 (Auxiliary Dispatch)
+| 用户意图 | 路由目标 |
+| :--- | :--- |
+| 检测到报错 / "修个Bug" | → `/analyze-error` |
+| "回滚" / "撤销" | → `/rollback` |
+| "状态" / "进度" | → `/status` |
+| "反思" / "总结" | → `/reflect` |
+| "知识 [query]" | → `/knowledge` |
+| "模式 [query]" | → `/patterns` |
+| "导出系统" | → `/export` |
+| "初始化环境" | → `/init` |
+
+## 3. 门禁规则 (Gatekeeper)
+- **Ambiguity Guard**: 需求模糊时强制反问，禁止直接进入 `Drafting Phase`。
+- **Approval Guard**: 
+    - PRD 必须用户确认 (`Go`) -> 才能进入 `/decompose`。
+    - Manifest 必须用户确认 -> 才能进入 `/feature-flow`。
+- **CI Guard**: 所有代码提交前必须通过 `flutter analyze` & `test`。
+
+## 4. 进化引擎自动触发
+| 触发事件 | 自动行为 |
+| :--- | :--- |
+| `/feature-flow` 结束 (All Done) | 自动触发 `/evolve` (知识收割) |
+| Bug 修复成功 | 自动提取 Error Pattern |
+| Session 结束/挂起 | 自动更新 `active_context.md` |

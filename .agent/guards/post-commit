@@ -1,0 +1,51 @@
+#!/bin/sh
+# ============================================================
+# Axiom — Post-commit Guard (T-302)
+#
+# 功能: 提交后自动创建 checkpoint tag（如果距上次 > 30 分钟）
+# 行为: 静默模式，自动创建 tag，失败不阻断
+# 安装: cp .agent/guards/post-commit .git/hooks/post-commit
+#        chmod +x .git/hooks/post-commit
+# ============================================================
+
+GUARD_NAME="Axiom Guard"
+CHECKPOINT_INTERVAL=1800  # 30 分钟 = 1800 秒
+
+# ── 1. 获取上一个 checkpoint tag ──
+LAST_CP=$(git tag -l "checkpoint-*" --sort=-creatordate 2>/dev/null | head -1)
+
+CREATE_TAG=false
+
+if [ -z "$LAST_CP" ]; then
+    # 没有 checkpoint，创建第一个
+    CREATE_TAG=true
+else
+    # 计算距上次 checkpoint 的时间差
+    LAST_CP_TIME=$(git log -1 --format=%ct "$LAST_CP" 2>/dev/null || echo 0)
+    CURRENT_TIME=$(date +%s)
+    DIFF=$(( CURRENT_TIME - LAST_CP_TIME ))
+
+    if [ "$DIFF" -gt "$CHECKPOINT_INTERVAL" ]; then
+        CREATE_TAG=true
+    fi
+fi
+
+# ── 2. 创建 checkpoint tag ──
+if [ "$CREATE_TAG" = true ]; then
+    TAG_NAME="checkpoint-$(date +%Y%m%d-%H%M%S)"
+    if git tag "$TAG_NAME" 2>/dev/null; then
+        echo "✅ [$GUARD_NAME] 检查点已创建: $TAG_NAME"
+    else
+        echo "⚠️  [$GUARD_NAME] 检查点创建失败 (非阻断)"
+    fi
+fi
+
+# ── 3. 统计本次提交的变更 ──
+CHANGED_FILES=$(git diff --name-only HEAD~1 HEAD 2>/dev/null | wc -l | tr -d ' ')
+AGENT_FILES=$(git diff --name-only HEAD~1 HEAD 2>/dev/null | grep "^\.agent/" | wc -l | tr -d ' ')
+
+if [ "$AGENT_FILES" -gt 0 ]; then
+    echo "📊 [$GUARD_NAME] 本次提交: ${CHANGED_FILES} 文件 (其中 ${AGENT_FILES} 个 Agent 文件)"
+fi
+
+exit 0

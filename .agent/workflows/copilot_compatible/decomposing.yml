@@ -1,0 +1,36 @@
+name: "Phase 2: 任务拆解"
+description: "将 Rough PRD 转化为 Manifest 和子文档。"
+prerequisites:
+  - "docs/prd/${{ name }}-rough.md"
+steps:
+  - name: "工期评估门禁"
+    run: |
+      if workload < 1 day:
+        return "fast-track (skip decomposition)"
+      else:
+        continue
+
+  - name: "架构设计 (Manifest)"
+    uses: "system-architect"
+    with:
+      input: "rough.md"
+    output: "docs/tasks/${{ id }}/manifest.md"
+
+  - name: "串行生成子文档"
+    type: "loop"
+    items: "${{ manifest.tasks }}"
+    run: "codex exec --role sub_prd_writer"
+    context: ["rough.md", "manifest.md", "previous_sub_prds"]
+
+  - name: "一致性审计 (PM Audit)"
+    run: "PM Check (Alignment & Self-Consistency)"
+    on_fail: "Auto-Fix Sub-PRD"
+
+  - name: "用户确认门禁"
+    type: "gate"
+    message: "任务拆解已完成。是否开始开发？"
+    options:
+      - label: "是 (开发)"
+        run: "workflow: implementing"
+      - label: "否 (停止)"
+        run: "stop"

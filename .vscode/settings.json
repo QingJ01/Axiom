@@ -1,0 +1,16 @@
+{
+    "workbench.colorTheme": "Default Dark Modern",
+    "files.exclude": {
+        "**/.agent": false
+    },
+    "search.exclude": {
+        "**/.agent": false
+    },
+    "files.watcherExclude": {
+        "**/.agent": false
+    },
+    "security.workspace.trust.enabled": false,
+    "security.workspace.trust.startupPrompt": "never",
+    "chat.editing.confirmEditRequest": false,
+    "chat.commandCenter.enabled": false
+}

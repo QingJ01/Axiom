@@ -1,0 +1,26 @@
+name: "Phase 1: 需求澄清与起草"
+description: "将模糊需求转化为结构化的 PRD 初稿。"
+steps:
+  - name: "需求澄清循环"
+    uses: "requirement-analyst"
+    with:
+      input: "${{ user.input }}"
+    on_result:
+      REJECT: "终止流程并反馈原因"
+      CLARIFY: "向用户提问并等待回复 (Loop)"
+      PASS: "继续执行下一步"
+
+  - name: "生成 PRD 初稿"
+    uses: "product-design-expert"
+    with:
+      context: "${{ requirement.context }}"
+    output: "docs/prd/${{ name }}-draft.md"
+
+  - name: "用户确认门禁"
+    type: "gate"
+    message: "PRD 初稿已生成，是否进入专家评审？"
+    options:
+      - label: "是 (进入评审)"
+        run: "workflow: reviewing"
+      - label: "否 (停止)"
+        run: "stop"

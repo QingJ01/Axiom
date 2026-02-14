@@ -1,0 +1,25 @@
+name: "Phase 3: 开发交付"
+description: "并行执行任务，通过编译门禁，生成交付报告。"
+prerequisites:
+  - "docs/tasks/${{ id }}/manifest.md"
+steps:
+  - name: "开发微循环 (Micro-Cycle)"
+    type: "loop"
+    strategy: "parallel (max 3)"
+    until: "all tasks == [x]"
+    run: "codex exec --role full_stack_worker"
+    check: "DAG Ready & File Lock"
+
+  - name: "编译门禁 (Compilation Gate)"
+    run: "flutter build apk --debug"
+    on_success: "proceed"
+    on_fail: "workflow: analyze-error"
+
+  - name: "生成交付报告"
+    uses: "report-generator"
+    output:
+      file: "docs/reports/rd_report.md"
+      sync: "feishu-doc-assistant"
+
+  - name: "交付通知"
+    message: "交付完成！报告：${{ report_link }}。"

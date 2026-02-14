@@ -4,6 +4,9 @@ import 'package:axiom_manager/core/doctor/doctor_service.dart';
 import 'package:axiom_manager/core/installer/install_engine.dart';
 import 'package:axiom_manager/core/installer/install_models.dart';
 import 'package:axiom_manager/core/source/axiom_source_service.dart';
+import 'package:axiom_manager/i18n/app_language.dart';
+import 'package:axiom_manager/i18n/app_strings.dart';
+import 'package:axiom_manager/i18n/language_pref_service.dart';
 import 'package:axiom_manager/ui/theme.dart';
 import 'package:axiom_manager/ui/widgets/axiom_button.dart';
 import 'package:axiom_manager/ui/widgets/glass_container.dart';
@@ -15,16 +18,77 @@ void main() {
   runApp(const MyApp());
 }
 
-class MyApp extends StatelessWidget {
-  const MyApp({super.key});
+class MyApp extends StatefulWidget {
+  const MyApp({
+    super.key,
+    this.forcedLanguage,
+    this.persistLanguage = true,
+  });
+
+  final AppLanguage? forcedLanguage;
+  final bool persistLanguage;
+
+  @override
+  State<MyApp> createState() => _MyAppState();
+}
+
+class _MyAppState extends State<MyApp> {
+  final _prefService = LanguagePrefService();
+  AppLanguage _language = AppLanguage.en;
+  bool _ready = false;
+
+  @override
+  void initState() {
+    super.initState();
+    _initLanguage();
+  }
+
+  Future<void> _initLanguage() async {
+    if (widget.forcedLanguage != null) {
+      setState(() {
+        _language = widget.forcedLanguage!;
+        _ready = true;
+      });
+      return;
+    }
+
+    final localeCode = WidgetsBinding.instance.platformDispatcher.locale.languageCode;
+    final loaded = await _prefService.load(systemLanguageCode: localeCode);
+    if (!mounted) return;
+    setState(() {
+      _language = loaded;
+      _ready = true;
+    });
+  }
+
+  Future<void> _onLanguageChanged(AppLanguage next) async {
+    setState(() {
+      _language = next;
+    });
+    if (widget.persistLanguage) {
+      await _prefService.save(next);
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
+    if (!_ready) {
+      return MaterialApp(
+        home: Scaffold(
+          body: Center(child: CircularProgressIndicator()),
+        ),
+      );
+    }
+
+    final strings = AppStrings(_language);
     return MaterialApp(
-      title: 'Axiom Manager',
+      title: strings.t('appTitle'),
       debugShowCheckedModeBanner: false,
       theme: AxiomTheme.darkTheme,
-      home: const InstallerHomePage(),
+      home: InstallerHomePage(
+        language: _language,
+        onLanguageChanged: _onLanguageChanged,
+      ),
     );
   }
 }
@@ -40,11 +104,16 @@ class ProviderOption {
 class InstallerHomePage extends StatefulWidget {
   const InstallerHomePage({
     super.key,
+    required this.language,
+    required this.onLanguageChanged,
     this.engine,
     this.doctor,
     this.sourceService,
     this.directoryPicker,
   });
+
+  final AppLanguage language;
+  final Future<void> Function(AppLanguage language) onLanguageChanged;
 
   final InstallEngine? engine;
   final DoctorService? doctor;
@@ -78,7 +147,9 @@ class _InstallerHomePageState extends State<InstallerHomePage> {
   String _provider = 'gemini_cli';
   bool _showLegacyProviders = false;
   bool _busy = false;
-  String _output = '> Axiom Manager Ready.\n> Waiting for user input...';
+  String _output = '';
+
+  AppStrings get _strings => AppStrings(widget.language);
 
   @override
   void initState() {
@@ -87,6 +158,7 @@ class _InstallerHomePageState extends State<InstallerHomePage> {
     _doctor = widget.doctor ?? DoctorService();
     _sourceService = widget.sourceService ?? AxiomSourceService();
     _directoryPicker = widget.directoryPicker ?? (() => getDirectoryPath());
+    _output = _welcomeText();
     _initSourcePath();
   }
 
@@ -96,6 +168,16 @@ class _InstallerHomePageState extends State<InstallerHomePage> {
     _targetController.dispose();
     _scrollController.dispose();
     super.dispose();
+  }
+
+  @override
+  void didUpdateWidget(covariant InstallerHomePage oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (oldWidget.language != widget.language && _output.startsWith('>')) {
+      setState(() {
+        _output = _welcomeText();
+      });
+    }
   }
 
   void _log(String message) {
@@ -118,6 +200,10 @@ class _InstallerHomePageState extends State<InstallerHomePage> {
     setState(() {
       _output = '> Console cleared.';
     });
+  }
+
+  String _welcomeText() {
+    return '> ${_strings.t('logReady1')}\n> ${_strings.t('logReady2')}';
   }
 
   @override
@@ -205,16 +291,16 @@ class _InstallerHomePageState extends State<InstallerHomePage> {
                                  ),
                                ),
                                const SizedBox(height: 12),
-                               Align(
-                                 alignment: Alignment.centerRight,
-                                 child: TextButton.icon(
-                                   onPressed: _clearLog,
-                                   icon: const Icon(Icons.cleaning_services, size: 16),
-                                   label: const Text('Clear Console'),
-                                   style: TextButton.styleFrom(
-                                     foregroundColor: AxiomTheme.textSecondary,
-                                   ),
-                                 ),
+                                Align(
+                                  alignment: Alignment.centerRight,
+                                  child: TextButton.icon(
+                                    onPressed: _clearLog,
+                                    icon: const Icon(Icons.cleaning_services, size: 16),
+                                    label: Text(_strings.t('clearConsole')),
+                                    style: TextButton.styleFrom(
+                                      foregroundColor: AxiomTheme.textSecondary,
+                                    ),
+                                  ),
                                )
                              ],
                            ),
@@ -240,7 +326,7 @@ class _InstallerHomePageState extends State<InstallerHomePage> {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Text(
-              'AXIOM MANAGER',
+              _strings.t('headerTitle'),
               style: Theme.of(context).textTheme.headlineMedium,
             ),
             Text(
@@ -251,6 +337,18 @@ class _InstallerHomePageState extends State<InstallerHomePage> {
               ),
             ),
           ],
+        ),
+        const Spacer(),
+        OutlinedButton(
+          onPressed: _busy
+              ? null
+              : () {
+                  final next = widget.language == AppLanguage.en
+                      ? AppLanguage.zh
+                      : AppLanguage.en;
+                  widget.onLanguageChanged(next);
+                },
+          child: Text(widget.language == AppLanguage.en ? 'EN' : '中文'),
         ),
       ],
     );
@@ -276,13 +374,22 @@ class _InstallerHomePageState extends State<InstallerHomePage> {
           controller: _sourceController,
           readOnly: true,
           decoration: InputDecoration(
-            labelText: 'Axiom Source Path',
+            labelText: _strings.t('sourcePath'),
             prefixIcon: const Icon(Icons.folder_shared_outlined),
             suffixIcon: IconButton(
               icon: const Icon(Icons.sync),
-              tooltip: 'Sync Source',
+              tooltip: _strings.t('syncSource'),
               onPressed: _busy ? null : _syncSource,
             ),
+          ),
+        ),
+        const SizedBox(height: 10),
+        Align(
+          alignment: Alignment.centerRight,
+          child: OutlinedButton.icon(
+            onPressed: _busy ? null : _forceSync,
+            icon: const Icon(Icons.warning_amber_rounded),
+            label: Text(_strings.t('forceSync')),
           ),
         ),
       ],
@@ -295,9 +402,9 @@ class _InstallerHomePageState extends State<InstallerHomePage> {
         Expanded(
           child: TextField(
             controller: _targetController,
-            decoration: const InputDecoration(
-              labelText: 'Target Directory',
-              prefixIcon: Icon(Icons.folder_open_outlined),
+            decoration: InputDecoration(
+              labelText: _strings.t('targetDirectory'),
+              prefixIcon: const Icon(Icons.folder_open_outlined),
             ),
           ),
         ),
@@ -305,7 +412,7 @@ class _InstallerHomePageState extends State<InstallerHomePage> {
         IconButton.filledTonal(
           onPressed: _busy ? null : _pickTargetDirectory,
           icon: const Icon(Icons.more_horiz),
-          tooltip: 'Browse...',
+          tooltip: _strings.t('browse'),
         ),
       ],
     );
@@ -318,9 +425,9 @@ class _InstallerHomePageState extends State<InstallerHomePage> {
         DropdownButtonFormField<String>(
           value: _provider,
           isExpanded: true,
-          decoration: const InputDecoration(
-            prefixIcon: Icon(Icons.psychology),
-            labelText: 'Active Provider',
+          decoration: InputDecoration(
+            prefixIcon: const Icon(Icons.psychology),
+            labelText: _strings.t('activeProvider'),
           ),
           dropdownColor: AxiomTheme.surface,
           items: options.map((p) {
@@ -355,7 +462,7 @@ class _InstallerHomePageState extends State<InstallerHomePage> {
               }
             });
           },
-          title: const Text('Show Legacy Providers'),
+          title: Text(_strings.t('showLegacy')),
           controlAffinity: ListTileControlAffinity.leading,
           dense: true,
           contentPadding: EdgeInsets.zero,
@@ -370,20 +477,20 @@ class _InstallerHomePageState extends State<InstallerHomePage> {
       runSpacing: 12,
       children: [
         AxiomButton(
-          label: 'Preview Changes',
+          label: _strings.t('preview'),
           icon: Icons.preview,
           onPressed: _busy ? null : _preview,
           isPrimary: false,
         ),
         AxiomButton(
-          label: 'Inject / Apply',
+          label: _strings.t('apply'),
           icon: Icons.rocket_launch,
           onPressed: _busy ? null : _apply,
           isLoading: _busy,
           isPrimary: true,
         ),
         AxiomButton(
-          label: 'Health Check',
+          label: _strings.t('healthCheck'),
           icon: Icons.monitor_heart,
           onPressed: _busy ? null : _checkHealth,
           isPrimary: false,
@@ -412,6 +519,30 @@ class _InstallerHomePageState extends State<InstallerHomePage> {
     _log('Target directory selected: $dir');
   }
 
+  Future<void> _forceSync() async {
+    final confirm = await showDialog<bool>(
+      context: context,
+      builder: (ctx) {
+        return AlertDialog(
+          title: Text(_strings.t('forceSync')),
+          content: Text(_strings.t('forceSyncConfirm')),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.of(ctx).pop(false),
+              child: const Text('Cancel'),
+            ),
+            FilledButton(
+              onPressed: () => Navigator.of(ctx).pop(true),
+              child: const Text('OK'),
+            ),
+          ],
+        );
+      },
+    );
+    if (confirm != true) return;
+    await _syncSource(force: true);
+  }
+
   InstallConfig _config() {
     return InstallConfig(
       sourceRoot: _sourceController.text.trim(),
@@ -420,13 +551,13 @@ class _InstallerHomePageState extends State<InstallerHomePage> {
     );
   }
 
-  Future<void> _syncSource() async {
+  Future<void> _syncSource({bool force = false}) async {
     setState(() {
       _busy = true;
     });
-    _log('Syncing Axiom source...');
+    _log(_strings.t('logSyncing'));
 
-    final result = await _sourceService.sync();
+    final result = await _sourceService.sync(force: force);
     if (!mounted) return;
     setState(() {
       _busy = false;
@@ -551,10 +682,14 @@ class _InstallerHomePageState extends State<InstallerHomePage> {
       _log('Status: ${report.ok ? 'HEALTHY' : 'ISSUES FOUND'}');
       
       if (report.errors.isNotEmpty) {
-        for (var e in report.errors) _log('[ERROR] $e');
+        for (var e in report.errors) {
+          _log('[ERROR] $e');
+        }
       }
       if (report.warnings.isNotEmpty) {
-        for (var w in report.warnings) _log('[WARN] $w');
+        for (var w in report.warnings) {
+          _log('[WARN] $w');
+        }
       }
       if (report.ok) {
          _log('No critical issues found.');
@@ -571,11 +706,11 @@ class _InstallerHomePageState extends State<InstallerHomePage> {
 
   bool _validateInput() {
     if (_targetController.text.trim().isEmpty) {
-      _log('[ERROR] Target project directory is empty.');
+      _log('[ERROR] ${_strings.t('logTargetRequired')}');
       return false;
     }
     if (_sourceController.text.trim().isEmpty) {
-      _log('[ERROR] Axiom Source Path is empty. Please sync.');
+      _log('[ERROR] ${_strings.t('logSourceRequired')}');
       return false;
     }
     return true;

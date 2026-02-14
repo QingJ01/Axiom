@@ -36,6 +36,10 @@ task_status: IDLE
       Directory('${sourceDir.path}/.github').createSync(recursive: true);
       File('${sourceDir.path}/.github/prompts.md').writeAsStringSync('prompt');
 
+      final binaryDir = Directory('${sourceDir.path}/.agent/assets')
+        ..createSync(recursive: true);
+      File('${binaryDir.path}/icon.bin').writeAsBytesSync(const <int>[0, 1, 2, 255]);
+
       engine = InstallEngine();
     });
 
@@ -106,6 +110,27 @@ task_status: IDLE
             '${targetDir.path}/.agent/memory/project_decisions.md',
           ).readAsStringSync();
       expect(restored, 'old');
+    });
+
+    test('plan should compare binary files safely', () async {
+      final targetBinaryDir = Directory('${targetDir.path}/.agent/assets')
+        ..createSync(recursive: true);
+      File('${targetBinaryDir.path}/icon.bin').writeAsBytesSync(
+        const <int>[0, 1, 2, 255],
+      );
+
+      final plan = await engine.plan(
+        InstallConfig(
+          sourceRoot: sourceDir.path,
+          targetRoot: targetDir.path,
+          activeProvider: 'gemini_cli',
+        ),
+      );
+
+      final item = plan.items.firstWhere(
+        (i) => i.relativePath == '.agent/assets/icon.bin',
+      );
+      expect(item.action, DiffAction.skip);
     });
   });
 }

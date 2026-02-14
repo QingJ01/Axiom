@@ -76,6 +76,27 @@ void main() {
       expect(commands.any((c) => c.length >= 2 && c[1] == 'reset'), isFalse);
     });
 
+    test('sync should continue reset when local repo is dirty and force=true', () async {
+      final sourceDir = Directory('${sandbox.path}/res/axiom')
+        ..createSync(recursive: true);
+      Directory('${sourceDir.path}/.git').createSync(recursive: true);
+
+      final service = AxiomSourceService(
+        appDirResolver: () async => sandbox.path,
+        runner: (exe, args, {workingDirectory}) async {
+          commands.add([exe, ...args]);
+          if (args.length >= 2 && args[0] == 'status' && args[1] == '--porcelain') {
+            return ProcessResult(1, 0, 'M README.md\n', '');
+          }
+          return ProcessResult(1, 0, '', '');
+        },
+      );
+
+      final result = await service.sync(force: true);
+      expect(result.success, isTrue);
+      expect(commands.any((c) => c.length >= 2 && c[1] == 'reset'), isTrue);
+    });
+
     test('resolveSourcePath should fallback when preferred path is not writable', () async {
       final service = AxiomSourceService(
         appDirResolver: () async => '${sandbox.path}/app',
@@ -87,6 +108,23 @@ void main() {
       final path = await service.resolveSourcePath();
       expect(path.contains('${sandbox.path}/fallback'), isTrue);
       expect(path.endsWith('res${Platform.pathSeparator}axiom'), isTrue);
+    });
+
+    test('sync should fail when source directory exists but is not git repo', () async {
+      Directory('${sandbox.path}/res/axiom').createSync(recursive: true);
+
+      final service = AxiomSourceService(
+        appDirResolver: () async => sandbox.path,
+        runner: (exe, args, {workingDirectory}) async {
+          commands.add([exe, ...args]);
+          return ProcessResult(1, 0, '', '');
+        },
+      );
+
+      final result = await service.sync();
+      expect(result.success, isFalse);
+      expect(result.message.contains('不是 Git 仓库'), isTrue);
+      expect(commands.isEmpty, isTrue);
     });
   });
 }

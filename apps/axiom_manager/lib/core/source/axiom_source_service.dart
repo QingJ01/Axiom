@@ -58,7 +58,23 @@ class AxiomSourceService {
 
     try {
       final gitDir = Directory('${sourceDir.path}${Platform.pathSeparator}.git');
-      if (!sourceDir.existsSync() || !gitDir.existsSync()) {
+      if (!sourceDir.existsSync()) {
+        await _runGit(<String>['clone', '--branch', branch, repoUrl, sourcePath]);
+        return SourceSyncResult(
+          success: true,
+          sourcePath: sourcePath,
+          message: '已拉取 Axiom 到 $sourcePath',
+        );
+      }
+
+      if (!gitDir.existsSync()) {
+        if (!force) {
+          return SourceSyncResult(
+            success: false,
+            sourcePath: sourcePath,
+            message: '目标源目录不是 Git 仓库，已停止同步。请清理目录后重试，或使用 force 更新。',
+          );
+        }
         if (sourceDir.existsSync()) {
           sourceDir.deleteSync(recursive: true);
         }
@@ -118,6 +134,12 @@ class AxiomSourceService {
   }
 
   static Future<String> _defaultAppDirResolver() async {
+    final sep = Platform.pathSeparator;
+    final cwdPubspec = File('${Directory.current.path}${sep}pubspec.yaml');
+    if (cwdPubspec.existsSync()) {
+      return Directory.current.path;
+    }
+
     final exeParent = File(Platform.resolvedExecutable).parent;
     if (exeParent.existsSync()) {
       return exeParent.path;

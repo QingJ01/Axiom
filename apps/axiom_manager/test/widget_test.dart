@@ -1,12 +1,15 @@
 import 'package:flutter_test/flutter_test.dart';
 
+import 'package:axiom_manager/i18n/app_language.dart';
 import 'package:axiom_manager/main.dart';
 
 void main() {
   testWidgets('wizard should render source sync and directory picker actions', (
     WidgetTester tester,
   ) async {
-    await tester.pumpWidget(const MyApp());
+    await tester.pumpWidget(
+      const MyApp(forcedLanguage: AppLanguage.en, persistLanguage: false),
+    );
 
     expect(find.text('AXIOM MANAGER'), findsOneWidget);
     expect(find.text('Axiom Source Path'), findsOneWidget);
@@ -19,7 +22,9 @@ void main() {
   testWidgets('provider list should hide legacy options by default', (
     WidgetTester tester,
   ) async {
-    await tester.pumpWidget(const MyApp());
+    await tester.pumpWidget(
+      const MyApp(forcedLanguage: AppLanguage.en, persistLanguage: false),
+    );
 
     await tester.tap(find.text('gemini_cli').first);
     await tester.pump();
@@ -32,5 +37,20 @@ void main() {
     await tester.pumpAndSettle();
 
     expect(find.text('opencode'), findsWidgets);
+  });
+
+  testWidgets('language toggle should switch to Chinese text', (
+    WidgetTester tester,
+  ) async {
+    await tester.pumpWidget(
+      const MyApp(forcedLanguage: AppLanguage.en, persistLanguage: false),
+    );
+
+    expect(find.text('Preview Changes'), findsOneWidget);
+    await tester.tap(find.text('EN'));
+    await tester.pumpAndSettle();
+
+    expect(find.text('预览变更'), findsOneWidget);
+    expect(find.text('执行导入'), findsOneWidget);
   });
 }

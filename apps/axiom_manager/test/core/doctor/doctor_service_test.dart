@@ -61,12 +61,29 @@ last_checkpoint: null
       expect(report.errors, isEmpty);
     });
 
-    test('health check should report missing workflow', () async {
+    test('health check should warn when status workflow missing', () async {
       File('${projectDir.path}/.agent/workflows/status.md').deleteSync();
 
       final report = await DoctorService().check(projectDir.path);
+      expect(report.ok, isTrue);
+      expect(report.warnings.any((w) => w.contains('status.md')), isTrue);
+    });
+
+    test('health check should show actionable message when .agent missing', () async {
+      Directory('${projectDir.path}/.agent').deleteSync(recursive: true);
+
+      final report = await DoctorService().check(projectDir.path);
       expect(report.ok, isFalse);
-      expect(report.errors.any((e) => e.contains('status.md')), isTrue);
+      expect(report.errors.length, 1);
+      expect(report.errors.first.contains('同步/更新 Axiom'), isTrue);
+    });
+
+    test('health check should skip hook check for non-git project', () async {
+      Directory('${projectDir.path}/.git').deleteSync(recursive: true);
+
+      final report = await DoctorService().check(projectDir.path);
+      expect(report.ok, isTrue);
+      expect(report.warnings.any((w) => w.contains('已跳过 hook 检查')), isTrue);
     });
   });
 }

@@ -139,9 +139,10 @@ class InstallEngine {
           DiffItem(relativePath: relativePath, action: DiffAction.create),
         );
       } else {
-        final sourceText = entity.readAsStringSync();
-        final targetText = targetFile.readAsStringSync();
-        if (sourceText == targetText) {
+        final sourceBytes = entity.readAsBytesSync();
+        final targetBytes = targetFile.readAsBytesSync();
+        final same = _bytesEqual(sourceBytes, targetBytes);
+        if (same) {
           items.add(
             DiffItem(relativePath: relativePath, action: DiffAction.skip),
           );
@@ -188,7 +189,7 @@ class InstallEngine {
       }
 
       targetFile.parent.createSync(recursive: true);
-      targetFile.writeAsStringSync(entity.readAsStringSync());
+      targetFile.writeAsBytesSync(entity.readAsBytesSync());
       applied.add(relativePath);
     }
   }
@@ -312,5 +313,17 @@ class InstallEngine {
       return normalizedFull.substring(normalizedRoot.length + 1);
     }
     return normalizedFull;
+  }
+
+  bool _bytesEqual(List<int> a, List<int> b) {
+    if (a.length != b.length) {
+      return false;
+    }
+    for (var i = 0; i < a.length; i++) {
+      if (a[i] != b[i]) {
+        return false;
+      }
+    }
+    return true;
   }
 }

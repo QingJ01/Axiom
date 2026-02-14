@@ -22,7 +22,7 @@ $SizeMB = 0
 # Path to Axiom Conversations Directory
 # Dynamic detection for Windows ($env:USERPROFILE) and macOS/Linux ($env:HOME)
 $HomeDir = if ($env:USERPROFILE) { $env:USERPROFILE } else { $env:HOME }
-$ConversationsDir = Join-Path $HomeDir ".gemini\antigravity\conversations"
+$ConversationsDir = Join-Path $HomeDir ".gemini\axiom\conversations"
 
 if (Test-Path $ConversationsDir) {
     # Get the most recently modified .pb file

@@ -25,16 +25,16 @@ The skill executes the following pipeline:
 - **Entity**: Identify the core data models needed (e.g., User, Order, Product). (Optional: Class diagram).
 
 ### Step 3: Documentation (Drafting)
-- **Structure**: Create a standard Rough PRD (`docs/prd/[name]-rough.md`).
+- **Structure**: Create a standard Draft PRD (`docs/prd/[name]-draft.md`).
 - **Content**: Include Background, Goals, User Stories, Functional Requirements (High-Level), and the Flowchart.
 
 ## 4. Output Logic (File Generation)
 
-**File Path**: `docs/prd/[kebab-case-name]-rough.md`
+**File Path**: `docs/prd/[kebab-case-name]-draft.md`
 
 **Template**:
 ```markdown
-# PRD: [Feature Name] - Rough
+# PRD: [Feature Name] - Draft
 
 > **Status**: DRAFT
 > **Author**: Product Design Expert
@@ -65,7 +65,7 @@ The skill executes the following pipeline:
 
 **Input**: A validated requirement for "Login with Email".
 
-**Output**: Creates `docs/prd/login-feature-rough.md` with:
+**Output**: Creates `docs/prd/login-feature-draft.md` with:
 - Background: Need secure access.
 - Stories: As a user, I can login to access my data.
 - Diagram: Input Email -> Input Password -> Validate -> Success/Fail.

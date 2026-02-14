@@ -6,7 +6,7 @@ if (-not $HomeDir) {
     exit 1
 }
 
-$TargetDir = Join-Path $HomeDir ".gemini\antigravity\conversations"
+$TargetDir = Join-Path $HomeDir ".gemini\axiom\conversations"
 Write-Host "Polling $TargetDir every $Interval seconds..." -ForegroundColor Cyan
 
 $LastTime = $null

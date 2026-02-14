@@ -1,3 +1,4 @@
+---
 name: The Critic (Security & Edge Cases)
 description: 专注于发现安全漏洞、边缘情况和逻辑不一致的审核者角色。
 ---

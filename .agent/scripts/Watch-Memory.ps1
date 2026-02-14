@@ -25,7 +25,7 @@ if ([string]::IsNullOrEmpty($HomeDir)) {
     exit 1
 }
 
-$ConversationsDir = Join-Path $HomeDir ".gemini\antigravity\conversations"
+$ConversationsDir = Join-Path $HomeDir ".gemini\axiom\conversations"
 
 if (-not (Test-Path $ConversationsDir)) {
     Write-Host "Error: Conversations directory not found: $ConversationsDir" -ForegroundColor Red

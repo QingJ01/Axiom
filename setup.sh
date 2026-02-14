@@ -182,23 +182,6 @@ if [ -d "$BACKUP_DIR" ]; then
     rm -rf "$BACKUP_DIR"
 fi
 
-# 4.1.2 建立 .agents 兼容层（symlink -> .agent）
-AGENTS_DST="$TARGET_DIR/.agents"
-if [ -e "$AGENTS_DST" ] || [ -L "$AGENTS_DST" ]; then
-    rm -rf "$AGENTS_DST"
-fi
-
-if ln -s ".agent" "$AGENTS_DST" 2>/dev/null; then
-    ok "已创建兼容层 (.agents -> .agent)"
-else
-    if ln -s "$AGENT_DST" "$AGENTS_DST" 2>/dev/null; then
-        warn "相对 symlink 创建失败，已回退为绝对路径 symlink"
-    else
-        cp -r "$AGENT_DST" "$AGENTS_DST"
-        warn "symlink 创建失败，已降级为目录复制 (.agents/)"
-    fi
-fi
-
 # 4.1.1.1 Flutter 规范包（可选）
 if [ "$SDK" = "Flutter" ]; then
     prompt "是否下载 flutter-ai-advanced-template 规范包？(y/N): "
@@ -331,17 +314,10 @@ AGENT_IGNORE='
 .agent/memory/history/
 .agent/memory/evolution/workflow_metrics.md
 .agent/memory/evolution/learning_queue.md
-.agent/memory/evolution/reflection_log.md
+.agent/memory/reflection_log.md
 .agent/memory/evolution/pattern_library.md
-# agents (compat)
-.agents/memory/active_context.md
-.agents/memory/history/
-.agents/memory/evolution/workflow_metrics.md
-.agents/memory/evolution/learning_queue.md
-.agents/memory/evolution/reflection_log.md
 # 编译缓存
-.agent/**/__pycache__/
-.agents/**/__pycache__/'
+.agent/**/__pycache__/'
 
 if [ -f "$GITIGNORE_PATH" ]; then
     rules_to_ensure=(
@@ -349,15 +325,9 @@ if [ -f "$GITIGNORE_PATH" ]; then
         ".agent/memory/history/"
         ".agent/memory/evolution/workflow_metrics.md"
         ".agent/memory/evolution/learning_queue.md"
-        ".agent/memory/evolution/reflection_log.md"
+        ".agent/memory/reflection_log.md"
         ".agent/memory/evolution/pattern_library.md"
-        ".agents/memory/active_context.md"
-        ".agents/memory/history/"
-        ".agents/memory/evolution/workflow_metrics.md"
-        ".agents/memory/evolution/learning_queue.md"
-        ".agents/memory/evolution/reflection_log.md"
         ".agent/**/__pycache__/"
-        ".agents/**/__pycache__/"
     )
 
     missing_count=0

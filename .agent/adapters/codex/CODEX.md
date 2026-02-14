@@ -86,7 +86,7 @@
 | 任务类型 | 调用技能 | 位置 |
 |---------|---------|-----|
 | 代码生成 | `codex-engine` | 内置 |
-| 错误修复 | `exception-guardian` | 全局 `.gemini/antigravity/skills/` |
+| 错误修复 | `exception-guardian` | 全局技能库（如已安装） |
 | 文档查阅 | `context-manager` | 项目级 `.agent/skills/` |
 
 ---

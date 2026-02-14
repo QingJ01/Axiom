@@ -17,7 +17,7 @@ The skill performs a two-step analysis:
 
 ### Step 1: Feasibility Check (The Red Gate)
 - **Safety**: Does this request violate safety guidelines or ethical boundaries?
-- **Alignment**: Does this deviate significantly from the improved AgentOS core value (e.g. asking for a recipe in a dev tool)?
+- **Alignment**: Does this deviate significantly from the Axiom core value (e.g. asking for a recipe in a dev tool)?
 - **Technical Reality**: Is this technically impossible (e.g. solving P=NP)?
 
 ### Step 2: Clarity Check (The Yellow Gate)

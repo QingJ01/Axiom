@@ -1,5 +1,5 @@
 ---
-description: 修改 AgentOS 系统配置（入口）
+description: 修改 Axiom 系统配置（入口）
 ---
 
 你将执行仓库内置的 `/meta` 工作流。

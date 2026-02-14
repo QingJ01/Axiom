@@ -15,8 +15,6 @@
   - 工作流 (13个)
   - 进化引擎
   
-- ✅ `.agents/` - 兼容层（优先链接 `.agent/`，失败时回退为复制）
-  - 保留旧路径，避免历史脚本失效
 
 ### 配置与文档
 - ✅ `docs/` - 完整文档
@@ -193,10 +191,11 @@
 ## 📚 参考文档
 
 在 `docs/` 目录中有完整的参考文档：
-- `docs/prd/DONE-axiom-v4-user.md` - 用户手册
-- `docs/prd/DONE-axiom-v4-dev.md` - 开发者手册
-- `docs/prd/DONE-evolution-engine.md` - 进化引擎说明
-- `docs/guides/USER_GUIDE.md` - 用户指南
+- `docs/index.md` - 官网首页与导航
+- `docs/guide/quickstart.md` - 快速开始
+- `docs/guide/tutorial.md` - 实战教程
+- `docs/guide/workflows.md` - 工作流说明
+- `docs/guide/commands.md` - 命令参考
 
 ---
 

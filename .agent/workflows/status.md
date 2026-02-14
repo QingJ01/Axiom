@@ -33,12 +33,13 @@ updated: 2026-02-09
 
 ### Step 4: 反思摘要
 // turbo
-1. 读取 `.agent/memory/evolution/reflection_log.md`
+1. 读取 `.agent/memory/reflection_log.md`
 2. 提取最近 5 条反思摘要 (日期 + Session 名 + 关键 Learning)
 
 ### Step 5: 工作流指标趋势
 // turbo
-1. 读取 `.agent/memory/evolution/workflow_metrics.md`
+1. 尝试读取 `.agent/memory/evolution/workflow_metrics.md`
+   - 若文件不存在，返回 `N/A`，不中断 `/status`
 2. 提取各工作流最近一次执行记录
 3. 计算全局统计 (总执行/成功率/平均耗时)
 
@@ -121,5 +122,5 @@ updated: 2026-02-09
 
 ---
 *Dashboard generated at: {timestamp}*
-*Axiom v4.0*
+*Axiom v4.2*
 ```

@@ -37,7 +37,7 @@ description: Evolve Workflow - 手动触发进化，处理学习队列并优化�
 
 ### Step 5: 分析工作流效能
 // turbo
-1. 读取 `workflow_metrics.md`
+1. 尝试读取 `workflow_metrics.md`（不存在则记为 `N/A`，不中断）
 2. 计算各工作流指标：
    - 平均耗时
    - 成功率

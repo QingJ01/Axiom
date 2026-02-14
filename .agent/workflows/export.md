@@ -15,7 +15,6 @@ description: Export Command - 导出 Axiom 系统为可移植压缩包
 用于创建新项目时的干净起点。
 
 **包含**:
-- `.agent/` 目录结构（兼容旧结构）
 - `.agent/` 目录结构（当前主结构：memory/skills/workflows）
 - `.github/`（Copilot 配置与 Prompt Files）
 - `.gemini/GEMINI.md.example`（如存在）
@@ -42,6 +41,12 @@ description: Export Command - 导出 Axiom 系统为可移植压缩包
 
 ## Steps
 
+### Step 0: 解析项目根目录
+// turbo
+1. 优先使用 Git 根目录作为 `PROJECT_ROOT`：`git rev-parse --show-toplevel`。
+2. 若非 Git 仓库，则使用当前工作目录作为 `PROJECT_ROOT`。
+3. 回显：`Project root: $PROJECT_ROOT`。
+
 ### Step 1: 确定导出模式
 // turbo
 1. 解析用户输入，确定是 `template` 还是 `full`。
@@ -49,17 +54,29 @@ description: Export Command - 导出 Axiom 系统为可移植压缩包
 
 ### Step 2: 创建临时目录
 ```bash
-exportDir="$(mktemp -d -t antigravity-export-XXXXXXXX)"
+exportDir="$(mktemp -d -t axiom-export-XXXXXXXX)"
 echo "Export temp dir: $exportDir"
+```
+
+```powershell
+$exportDir = Join-Path $env:TEMP ("axiom-export-" + [System.Guid]::NewGuid().ToString("N"))
+New-Item -ItemType Directory -Path $exportDir -Force | Out-Null
+Write-Host "Export temp dir: $exportDir"
 ```
 
 ### Step 3: 复制系统文件
 ```bash
-rsync -a .agent "$exportDir/" 2>/dev/null || true
-rsync -a .agents "$exportDir/" 2>/dev/null || true
-[ -d .github ] && rsync -a .github "$exportDir/"
-[ -d .gemini ] && rsync -a .gemini "$exportDir/"
-rsync -a README.md "$exportDir/"
+rsync -a "$PROJECT_ROOT/.agent" "$exportDir/" 2>/dev/null || true
+[ -d "$PROJECT_ROOT/.github" ] && rsync -a "$PROJECT_ROOT/.github" "$exportDir/"
+[ -d "$PROJECT_ROOT/.gemini" ] && rsync -a "$PROJECT_ROOT/.gemini" "$exportDir/"
+[ -f "$PROJECT_ROOT/README.md" ] && rsync -a "$PROJECT_ROOT/README.md" "$exportDir/"
+```
+
+```powershell
+if (Test-Path "$PROJECT_ROOT/.agent") { Copy-Item "$PROJECT_ROOT/.agent" "$exportDir" -Recurse -Force }
+if (Test-Path "$PROJECT_ROOT/.github") { Copy-Item "$PROJECT_ROOT/.github" "$exportDir" -Recurse -Force }
+if (Test-Path "$PROJECT_ROOT/.gemini") { Copy-Item "$PROJECT_ROOT/.gemini" "$exportDir" -Recurse -Force }
+if (Test-Path "$PROJECT_ROOT/README.md") { Copy-Item "$PROJECT_ROOT/README.md" "$exportDir" -Force }
 ```
 
 ### Step 4: Template 模式清理 (仅 template 模式)
@@ -79,14 +96,26 @@ rsync -a README.md "$exportDir/"
 
 ### Step 5: 生成压缩包
 ```bash
-zipName="antigravity-axiom-$(date +%Y%m%d).zip"
-(cd "$exportDir" && zip -rq "$PWD/../$zipName" .)
-echo "Output: $zipName"
+zipName="axiom-export-$(date +%Y%m%d).zip"
+outputPath="$PROJECT_ROOT/$zipName"
+(cd "$exportDir" && zip -rq "$outputPath" .)
+echo "Output: $outputPath"
+```
+
+```powershell
+$zipName = "axiom-export-$(Get-Date -Format yyyyMMdd).zip"
+$outputPath = Join-Path $PROJECT_ROOT $zipName
+Compress-Archive -Path (Join-Path $exportDir "*") -DestinationPath $outputPath -Force
+Write-Host "Output: $outputPath"
 ```
 
 ### Step 6: 清理临时目录
 ```bash
 rm -rf "$exportDir"
+```
+
+```powershell
+Remove-Item $exportDir -Recurse -Force
 ```
 
 ### Step 7: 输出结果
@@ -97,9 +126,9 @@ rm -rf "$exportDir"
 ## 📦 Export Complete
 
 **Mode**: Template / Full
-**Output**: `antigravity-axiom-20260208.zip`
+**Output**: `axiom-export-20260208.zip`
 **Size**: X KB
-**Location**: [Full Path]
+**Location**: `[PROJECT_ROOT]/axiom-export-20260208.zip`
 
 ### Included
 - `.agent/` (workflows, skills, rules, memory templates)

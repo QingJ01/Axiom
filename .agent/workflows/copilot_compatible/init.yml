@@ -3,30 +3,38 @@ description: "交互式初始化 Axiom 环境适配器"
 steps:
   - name: "环境问询"
     type: "ask_user"
-    message: "欢迎使用 Axiom v4.2！请选择您的 AI 助手：\n1. GitHub Copilot\n2. Cursor AI\n3. Gemini\n4. Axiom CLI"
-    options: ["copilot", "cursor", "gemini", "antigravity"]
+    save_as: "assistant_choice"
+    message: "欢迎使用 Axiom v4.2！请选择您的 AI 助手：\n1. GitHub Copilot\n2. Cursor AI\n3. Gemini CLI\n4. Axiom CLI"
+    options: ["copilot", "cursor", "gemini_cli", "axiom_cli"]
 
   - name: "风险确认"
     type: "ask_user"
+    save_as: "risk_confirmed"
     message: "即将覆盖配置文件。是否继续？(系统将自动创建 .bak 备份)"
     options: ["yes", "no"]
 
   - name: "配置部署"
     type: "script"
     run: |
-      if selection == "copilot":
-        ensure_dir(".github")
-        backup(".github/copilot-instructions.md")
-        copy(".agent/adapters/copilot/COPILOT.md", ".github/copilot-instructions.md")
-      elif selection == "cursor":
-        backup(".cursorrules")
-        copy(".agent/adapters/cursor/.cursorrules", ".cursorrules")
-      elif selection == "gemini":
+      project_root = git_root_or_cwd()
+      if risk_confirmed != "yes":
+        stop("用户取消初始化")
+      if assistant_choice == "copilot":
+        ensure_dir(f"{project_root}/.github")
+        backup(f"{project_root}/.github/copilot-instructions.md")
+        copy(f"{project_root}/.agent/adapters/copilot/copilot-instructions.md", f"{project_root}/.github/copilot-instructions.md")
+      elif assistant_choice == "cursor":
+        backup(f"{project_root}/.cursorrules")
+        copy(f"{project_root}/.agent/adapters/cursor/.cursorrules", f"{project_root}/.cursorrules")
+      elif assistant_choice == "gemini_cli":
         ensure_dir("~/.gemini")
         backup("~/.gemini/GEMINI.md")
-        copy(".agent/adapters/gemini/GEMINI.md", "~/.gemini/GEMINI.md")
+        copy(f"{project_root}/.agent/adapters/gemini-cli/GEMINI-CLI.md", "~/.gemini/GEMINI.md")
+      elif assistant_choice == "axiom_cli":
+        note("Axiom CLI 使用项目内 .agent 规则，无需额外安装。")
 
   - name: "新手引导"
+    type: "message"
     message: |
       ✅ 初始化完成！
       试一试：

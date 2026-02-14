@@ -1,5 +1,5 @@
 ---
-description: Template for DAG analysis by System Architect.
+description: 系统架构专家的 DAG 分析模板。
 ---
 
 # Role
@@ -20,6 +20,6 @@ description: Template for DAG analysis by System Architect.
 ```json
 {
   "ready_tasks": ["T-001", "T-003"],
-  "reason": "T-001 has no deps. T-003 depends on T-002 which is done."
+  "reason": "T-001 无依赖可直接执行；T-003 依赖 T-002，且 T-002 已完成。"
 }
 ```

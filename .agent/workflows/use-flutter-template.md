@@ -9,14 +9,14 @@ description: Flutter 模板规范加载与拷贝（flutter-ai-advanced-template�
 ---
 
 ## Step 1: 确认目标项目
-- 询问用户目标项目路径（默认当前工作区）。
+- 询问用户目标项目路径（默认 `PROJECT_ROOT`，即 Git 根目录；若无 Git 则当前目录）。
 - 若目标不是 Flutter 项目，提示风险并要求确认继续。
 
 ## Step 2: 确认模板源
-- 默认模板源路径: `.agent/templates/flutter-ai-advanced-template`。
+- 默认模板源路径: `[PROJECT_ROOT]/.agent/templates/flutter-ai-advanced-template`。
 - 若不存在，则执行克隆:
   ```bash
-  git clone --depth 1 https://github.com/flockmaster/flutter-ai-advanced-template.git .agent/templates/flutter-ai-advanced-template
+  git clone --depth 1 https://github.com/flockmaster/flutter-ai-advanced-template.git [PROJECT_ROOT]/.agent/templates/flutter-ai-advanced-template
   ```
 
 ## Step 3: 选择拷贝模式

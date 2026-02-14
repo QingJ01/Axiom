@@ -3,7 +3,7 @@
 .agent/memory/history/
 .agent/memory/evolution/workflow_metrics.md
 .agent/memory/evolution/learning_queue.md
-.agent/memory/evolution/reflection_log.md
+.agent/memory/reflection_log.md
 .agent/**/__pycache__/
 .agent/memory/reviews/
 

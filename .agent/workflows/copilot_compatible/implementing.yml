@@ -3,11 +3,16 @@ description: "并行执行任务，通过编译门禁，生成交付报告。"
 prerequisites:
   - "docs/tasks/${{ id }}/manifest.md"
 steps:
+  - name: "解析执行器"
+    type: "script"
+    run: |
+      WORKER_EXEC = read_router_worker_exec(".agent/rules/provider_router.rule")
+
   - name: "开发微循环 (Micro-Cycle)"
     type: "loop"
     strategy: "parallel (max 3)"
     until: "all tasks == [x]"
-    run: "codex exec --role full_stack_worker"
+    run: "${WORKER_EXEC} --role full_stack_worker"
     check: "DAG Ready & File Lock"
 
   - name: "编译门禁 (Compilation Gate)"

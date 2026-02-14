@@ -10,16 +10,26 @@
 
 ## Step 1: 安装 Axiom
 
+### macOS / Linux
+
 ```bash
 git clone https://github.com/QingJ01/axiom.git
 cd axiom
 bash setup.sh /path/to/your-project
 ```
 
+### Windows (PowerShell)
+
 ```powershell
 git clone https://github.com/QingJ01/axiom.git
 cd axiom
-pwsh setup.ps1 -TargetDir "D:\your-project"
+.\setup.ps1 -TargetDir "D:\your-project"
+```
+
+如果你安装了 PowerShell 7，可替代为：
+
+```powershell
+pwsh .\setup.ps1 -TargetDir "D:\your-project"
 ```
 
 ## Step 2: 验证安装结果
@@ -27,7 +37,6 @@ pwsh setup.ps1 -TargetDir "D:\your-project"
 目标项目根目录应出现：
 
 - `.agent/`
-- `.agents`（可能是链接或普通目录）
 - `.gitignore` 中 Axiom 规则
 
 ## Step 3: 启动系统
@@ -57,3 +66,8 @@ pwsh setup.ps1 -TargetDir "D:\your-project"
 - 能看到系统进入可执行状态（IDLE 或任务状态）
 - 能接收并执行任务
 - 执行过程中产生结构化上下文更新
+
+## 常见平台问题
+
+- Windows 报错“无法识别 `pwsh`”：说明未安装 PowerShell 7，改用 `.\setup.ps1`
+- Linux/macOS 报权限问题：先确认用 `bash setup.sh ...` 启动脚本

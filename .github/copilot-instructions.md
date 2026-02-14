@@ -3,7 +3,7 @@
 # Version: 4.2 | Updated: 2026-02-13
 
 > 本文件是 GitHub Copilot 的用户规则。
-> 安装: 将此文件内容粘贴到 `.github/copilot-instructions.md` (或工作区的 COPILOT.md)
+> 安装: 将此文件内容粘贴到 `.github/copilot-instructions.md`
 
 ---
 

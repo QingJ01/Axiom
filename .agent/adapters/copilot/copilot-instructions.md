@@ -121,9 +121,9 @@
 | 生成 PRD | `prd-crafter-pro` | 项目级 `.agent/skills/` |
 | 专家评审 | `ai-expert-review-board` | 项目级 `.agent/skills/` |
 | 读写记忆 | `context-manager` | 项目级 `.agent/skills/` |
-| 错误分析 | `exception-guardian` | 全局 `.gemini/antigravity/skills/` |
-| UI/UX 设计 | `ui-ux-pro-max` | 全局 `.gemini/antigravity/skills/` |
-| 飞书文档 | `feishu-doc-assistant` | 全局 `.gemini/antigravity/skills/` |
+| 错误分析 | `exception-guardian` | 全局技能库（如已安装） |
+| UI/UX 设计 | `ui-ux-pro-max` | 全局技能库（如已安装） |
+| 飞书文档 | `feishu-doc-assistant` | 全局技能库（如已安装） |
 | **自进化** | `evolution-engine` | 项目级 `.agent/skills/` |
 
 ---

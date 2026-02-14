@@ -38,13 +38,26 @@
 2. 检查 `.agent/memory/project_decisions.md` 的 `Known Issues`
 3. 达到重试上限后：回滚到检查点或标记阻塞
 
-## `.agents` 显示为快捷方式
+## Windows 提示“无法识别 pwsh”
 
 ### 现象
 
-- Windows 中看到 `.agents` 类似快捷方式
+- PowerShell 报错：`pwsh` 不是可识别命令
 
 ### 处理
 
-- 这是正常行为，`.agents` 是兼容入口
-- 主目录始终以 `.agent` 为准
+1. 直接执行：`.\setup.ps1 -TargetDir "你的项目路径"`
+2. 或安装 PowerShell 7 后再用：`pwsh .\setup.ps1 ...`
+3. 若执行策略拦截，用：`powershell -ExecutionPolicy Bypass -File .\setup.ps1 ...`
+
+## `/export` 后找不到压缩包
+
+### 现象
+
+- 提示导出成功，但不知道文件在哪
+
+### 处理
+
+1. 优先查看导出结果中的 `Location` 绝对路径
+2. 默认输出在项目根目录，文件名形如 `axiom-export-YYYYMMDD.zip`
+3. 若仍找不到，确认触发命令时所在目录是否为目标项目

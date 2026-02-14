@@ -26,13 +26,14 @@ cd axiom
 bash setup.sh /path/to/your-project
 
 # Windows (PowerShell)
-pwsh setup.ps1 -TargetDir "D:\your-project"
+.\setup.ps1 -TargetDir "D:\your-project"
 ```
+
+若已安装 PowerShell 7，可使用：`pwsh .\setup.ps1 -TargetDir "D:\your-project"`
 
 安装向导会自动完成：
 
 - 拷贝/更新目标项目的 `.agent/`
-- 创建 `.agents` 兼容层（优先链接 `.agent`，失败时回退为复制）
 - 初始化或保留记忆文件（`project_decisions.md` / `active_context.md` 等）
 - 追加必要的 `.gitignore` 规则
 - 可选安装对应 AI 工具的全局指令文件
@@ -67,7 +68,6 @@ Project Root/
 │   ├── workflows/               # 流程定义
 │   ├── adapters/                # 工具适配器
 │   └── ...
-├── .agents/                     # 兼容入口（优先链接，失败回退复制）
 └── docs/                        # 文档与产物
 ```
 
@@ -88,11 +88,9 @@ Project Root/
 
 ## 跨平台说明
 
-- 预览品牌站：
-  - Windows: `start branding-site/index.html`
-  - macOS: `open branding-site/index.html`
-  - Linux: `xdg-open branding-site/index.html`
-- `.agents` 在不同系统上可能显示为快捷方式、链接或普通目录（降级模式），均属正常
+- 预览文档站：`npm run docs:dev`
+- 生成静态文档：`npm run docs:build`
+- 本地预览构建产物：`npm run docs:preview`
 
 ---
 
@@ -145,7 +143,7 @@ Project Root/
 
 - `bash -n setup.sh`
 - PowerShell 语法解析 `setup.ps1`
-- `node --check branding-site/js/main.js`
+- `npm run docs:build`
 
 ---
 

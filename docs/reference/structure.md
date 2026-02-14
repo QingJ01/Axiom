@@ -10,7 +10,6 @@ Project Root/
 │   ├── adapters/           # AI 工具适配器
 │   ├── config/             # 系统配置
 │   └── knowledge/          # 知识资源
-├── .agents/                # 兼容入口
 ├── setup.sh                # macOS/Linux 安装器
 ├── setup.ps1               # Windows 安装器
 ├── README.md               # 项目总览

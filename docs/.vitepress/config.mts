@@ -31,7 +31,8 @@ export default defineConfig({
         items: [
           { text: "目录结构", link: "/reference/structure" },
           { text: "配置说明", link: "/reference/configuration" },
-          { text: "版本发布", link: "/reference/release" }
+          { text: "版本发布", link: "/reference/release" },
+          { text: "更新日志", link: "/reference/changelog" }
         ]
       }
     ],

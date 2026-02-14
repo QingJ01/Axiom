@@ -191,22 +191,6 @@ if (Test-Path $backupDir) {
     Remove-Item $backupDir -Recurse -Force
 }
 
-# 4.1.2 建立 .agents 兼容层（Junction -> .agent）
-$agentsDst = Join-Path $TargetDir ".agents"
-if (Test-Path $agentsDst) { Remove-Item $agentsDst -Recurse -Force }
-try {
-    New-Item -ItemType Junction -Path $agentsDst -Target ".agent" | Out-Null
-    Write-Ok "已创建兼容层 (.agents -> .agent)"
-} catch {
-    try {
-        New-Item -ItemType Junction -Path $agentsDst -Target $agentDst | Out-Null
-        Write-Warn "相对 Junction 创建失败，已回退为绝对路径 Junction"
-    } catch {
-        Copy-Item $agentDst $agentsDst -Recurse -Force
-        Write-Warn "Junction 创建失败，已降级为目录复制 (.agents/)"
-    }
-}
-
 # 4.1.1.1 Flutter 规范包（可选）
 if ($stack.sdk -eq "Flutter") {
     Write-Host "   是否下载 flutter-ai-advanced-template 规范包？(y/N): " -NoNewline -ForegroundColor Yellow
@@ -349,17 +333,10 @@ $agentIgnoreBlock = @"
 .agent/memory/history/
 .agent/memory/evolution/workflow_metrics.md
 .agent/memory/evolution/learning_queue.md
-.agent/memory/evolution/reflection_log.md
+.agent/memory/reflection_log.md
 .agent/memory/evolution/pattern_library.md
-# agents (compat)
-.agents/memory/active_context.md
-.agents/memory/history/
-.agents/memory/evolution/workflow_metrics.md
-.agents/memory/evolution/learning_queue.md
-.agents/memory/evolution/reflection_log.md
 # 编译缓存
 .agent/**/__pycache__/
-.agents/**/__pycache__/
 "@
 
 if (Test-Path $gitignorePath) {
@@ -369,15 +346,9 @@ if (Test-Path $gitignorePath) {
         ".agent/memory/history/",
         ".agent/memory/evolution/workflow_metrics.md",
         ".agent/memory/evolution/learning_queue.md",
-        ".agent/memory/evolution/reflection_log.md",
+        ".agent/memory/reflection_log.md",
         ".agent/memory/evolution/pattern_library.md",
-        ".agents/memory/active_context.md",
-        ".agents/memory/history/",
-        ".agents/memory/evolution/workflow_metrics.md",
-        ".agents/memory/evolution/learning_queue.md",
-        ".agents/memory/evolution/reflection_log.md",
-        ".agent/**/__pycache__/",
-        ".agents/**/__pycache__/"
+        ".agent/**/__pycache__/"
     )
     $missingRules = @()
     foreach ($rule in $rulesToEnsure) {

@@ -11,13 +11,24 @@ bash setup.sh /path/to/your-project
 ## Windows (PowerShell)
 
 ```powershell
-pwsh setup.ps1 -TargetDir "D:\your-project"
+.\setup.ps1 -TargetDir "D:\your-project"
+```
+
+如果你已安装 PowerShell 7，也可以用：
+
+```powershell
+pwsh .\setup.ps1 -TargetDir "D:\your-project"
+```
+
+如果脚本执行策略拦截，用：
+
+```powershell
+powershell -ExecutionPolicy Bypass -File .\setup.ps1 -TargetDir "D:\your-project"
 ```
 
 ## 安装器会做什么
 
 - 安装/更新目标项目 `.agent/`
-- 创建 `.agents` 兼容入口（优先链接，失败回退复制）
 - 初始化或保留记忆文件（`project_decisions.md`、`active_context.md`）
 - 补齐 `.gitignore` 规则
 - 可选写入 AI 工具全局配置
@@ -41,3 +52,9 @@ pwsh setup.ps1 -TargetDir "D:\your-project"
 - `.agent/memory/project_decisions.md` 存在
 - `.agent/memory/active_context.md` 存在
 - `/status` 可正常返回状态
+
+## 平台差异说明
+
+- macOS / Linux：使用 `setup.sh`
+- Windows：优先在 PowerShell 里直接运行 `.\setup.ps1`
+- `pwsh` 不是 Windows 必装项，未安装时不要用 `pwsh` 前缀

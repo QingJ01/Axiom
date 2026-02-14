@@ -3,6 +3,11 @@ description: "将 Rough PRD 转化为 Manifest 和子文档。"
 prerequisites:
   - "docs/prd/${{ name }}-rough.md"
 steps:
+  - name: "解析执行器"
+    type: "script"
+    run: |
+      WORKER_EXEC = read_router_worker_exec(".agent/rules/provider_router.rule")
+
   - name: "工期评估门禁"
     run: |
       if workload < 1 day:
@@ -13,14 +18,14 @@ steps:
   - name: "架构设计 (Manifest)"
     uses: "system-architect"
     with:
-      input: "rough.md"
+      input: "docs/prd/${{ name }}-rough.md"
     output: "docs/tasks/${{ id }}/manifest.md"
 
   - name: "串行生成子文档"
     type: "loop"
     items: "${{ manifest.tasks }}"
-    run: "codex exec --role sub_prd_writer"
-    context: ["rough.md", "manifest.md", "previous_sub_prds"]
+    run: "${WORKER_EXEC} --role .agent/prompts/roles/sub_prd_writer.md --input docs/tasks/${{ id }}/manifest.md"
+    context: ["docs/prd/${{ name }}-rough.md", "docs/tasks/${{ id }}/manifest.md", "docs/tasks/${{ id }}/sub_prds"]
 
   - name: "一致性审计 (PM Audit)"
     run: "PM Check (Alignment & Self-Consistency)"

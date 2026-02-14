@@ -32,6 +32,9 @@ migrate_working_dir/
 .pub-cache/
 .pub/
 /build/
+/res/
+analysis.txt
+analysis_2.txt
 
 # Symbolication related
 app.*.symbols

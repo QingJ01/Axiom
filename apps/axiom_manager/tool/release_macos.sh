@@ -31,6 +31,19 @@ if [[ "$MODE" != "unsigned" && "$MODE" != "signed" ]]; then
   exit 1
 fi
 
+if ! command -v flutter >/dev/null 2>&1; then
+  echo "flutter not found. Please install Flutter and add it to PATH."
+  exit 1
+fi
+if ! command -v git >/dev/null 2>&1; then
+  echo "git not found. Please install Git and add it to PATH."
+  exit 1
+fi
+if ! command -v ditto >/dev/null 2>&1; then
+  echo "ditto not found. This script must run on macOS."
+  exit 1
+fi
+
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 PROJECT_ROOT="$(cd "$SCRIPT_DIR/.." && pwd)"
 RELEASE_DIR="$PROJECT_ROOT/dist/macos/$MODE"

@@ -2,6 +2,13 @@
 
 Flutter Desktop 应用，用于图形化管理 Axiom 导入与健康检查。
 
+## 已实现能力
+
+- 自动同步 Axiom 源：默认在应用同目录 `res/axiom` 执行 clone/update
+- 目标项目目录选择器：点击“浏览...”选择目录
+- Provider 选择：默认展示 CLI 体系 (`gemini_cli`/`claude_code`/`codex`/`opencode`/`copilot`)
+- 兼容 Provider：`gemini` 与 `claude` 默认隐藏，可通过“显示兼容 Provider”开启
+
 ## 本地运行
 
 ```bash

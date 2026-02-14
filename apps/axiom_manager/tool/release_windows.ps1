@@ -7,6 +7,16 @@ param(
 
 $ErrorActionPreference = "Stop"
 
+if (-not (Get-Command flutter -ErrorAction SilentlyContinue)) {
+    throw "flutter not found. Please install Flutter and add it to PATH."
+}
+if (-not (Get-Command git -ErrorAction SilentlyContinue)) {
+    throw "git not found. Please install Git and add it to PATH."
+}
+if (-not (Get-Command cmake -ErrorAction SilentlyContinue)) {
+    throw "cmake not found. Please install CMake and add it to PATH."
+}
+
 $ProjectRoot = Split-Path -Parent $PSScriptRoot
 $ReleaseDir = Join-Path $ProjectRoot "dist/windows/$Mode"
 $BundleDir = Join-Path $ReleaseDir "axiom-manager-windows-$Mode"

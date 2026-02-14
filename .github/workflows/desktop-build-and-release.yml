@@ -1,0 +1,95 @@
+name: Desktop Build And Release
+
+on:
+  workflow_dispatch:
+  pull_request:
+    branches: [main]
+  push:
+    branches: [main]
+    tags:
+      - 'v*'
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+    name: Build (${{ matrix.os }})
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [windows-latest, macos-latest]
+
+    defaults:
+      run:
+        working-directory: apps/axiom_manager
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          channel: stable
+          flutter-version: 3.27.1
+
+      - name: Flutter Pub Get
+        run: flutter pub get
+
+      - name: Flutter Test
+        run: flutter test
+
+      - name: Resolve Build Version
+        id: version
+        shell: bash
+        run: |
+          REF_NAME="${GITHUB_REF_NAME}"
+          if [[ "${GITHUB_REF_TYPE}" == "tag" ]]; then
+            BUILD_NAME="${REF_NAME#v}"
+          else
+            BUILD_NAME="0.0.0-${GITHUB_RUN_NUMBER}"
+          fi
+          echo "build_name=${BUILD_NAME}" >> "$GITHUB_OUTPUT"
+          echo "build_number=${GITHUB_RUN_NUMBER}" >> "$GITHUB_OUTPUT"
+
+      - name: Build Windows Unsigned Package
+        if: matrix.os == 'windows-latest'
+        shell: pwsh
+        run: |
+          ./tool/release_windows.ps1 -Mode unsigned -BuildName "${{ steps.version.outputs.build_name }}" -BuildNumber "${{ steps.version.outputs.build_number }}"
+
+      - name: Build macOS Unsigned Package
+        if: matrix.os == 'macos-latest'
+        shell: bash
+        run: |
+          bash ./tool/release_macos.sh --mode unsigned --build-name "${{ steps.version.outputs.build_name }}" --build-number "${{ steps.version.outputs.build_number }}"
+
+      - name: Upload Build Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: axiom-manager-${{ matrix.os }}
+          path: |
+            apps/axiom_manager/dist/windows/unsigned/*.zip
+            apps/axiom_manager/dist/macos/unsigned/*.zip
+          if-no-files-found: error
+
+  release:
+    name: Publish GitHub Release
+    if: startsWith(github.ref, 'refs/tags/v')
+    needs: build
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Download Artifacts
+        uses: actions/download-artifact@v4
+        with:
+          path: release-artifacts
+          merge-multiple: true
+
+      - name: Publish Release Assets
+        uses: softprops/action-gh-release@v2
+        with:
+          files: release-artifacts/**/*.zip
+          generate_release_notes: true

@@ -11,8 +11,8 @@ export default defineConfig({
     logo: '/logo.svg',
     nav: [
       { text: "首页", link: "/" },
-      { text: "快速开始", link: "/guide/quickstart" },
-      { text: "实战教程", link: "/guide/tutorial" },
+      { text: "安装", link: "/guide/install-and-upgrade" },
+      { text: "系统原理", link: "/concepts/how-it-works" },
       { text: "命令参考", link: "/guide/commands" }
     ],
     sidebar: [
@@ -20,7 +20,7 @@ export default defineConfig({
         text: "使用指南",
         items: [
           { text: "快速开始", link: "/guide/quickstart" },
-          { text: "安装与运行", link: "/guide/installation" },
+          { text: "安装、升级与卸载", link: "/guide/install-and-upgrade" },
           { text: "实战教程", link: "/guide/tutorial" },
           { text: "工作流说明", link: "/guide/workflows" },
           { text: "命令参考", link: "/guide/commands" },
@@ -34,6 +34,21 @@ export default defineConfig({
           { text: "配置说明", link: "/reference/configuration" },
           { text: "版本发布", link: "/reference/release" },
           { text: "更新日志", link: "/reference/changelog" }
+        ]
+      },
+      {
+        text: "概念与原理",
+        items: [
+          { text: "项目用途与边界", link: "/concepts/purpose-and-scope" },
+          { text: "功能地图", link: "/concepts/feature-map" },
+          { text: "系统工作原理", link: "/concepts/how-it-works" },
+          { text: "原理 Q&A", link: "/concepts/principle-qa" }
+        ]
+      },
+      {
+        text: "关于项目",
+        items: [
+          { text: "关于项目", link: "/concepts/about-project" }
         ]
       }
     ],

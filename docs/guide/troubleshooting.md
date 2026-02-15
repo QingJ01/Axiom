@@ -1,63 +1,69 @@
 # 故障排查
 
+排查顺序建议：先目录与文件，再命令行为，最后看日志与回滚。
+
 ## `/start` 后没有恢复上下文
 
-### 现象
+检查项：
 
-- 系统无法识别当前任务状态
-- 总是提示重新开始
+1. `.agent/memory/active_context.md` 是否存在
+2. frontmatter 是否包含 `session_id`、`task_status`
+3. 是否在正确项目根目录执行命令
 
-### 处理
-
-1. 检查 `.agent/memory/active_context.md` 是否存在
-2. 检查 frontmatter 字段是否完整（`task_status` 等）
-3. 再次执行 `/start`
+处理：修复后再次执行 `/start`。
 
 ## `/status` 信息不完整
 
-### 现象
+检查项：
 
-- 仪表盘缺少知识统计或检查点信息
+1. `.agent/memory/evolution/` 是否存在
+2. `.agent/config/agent_config.md` 是否存在
+3. 最近是否手动修改过 memory 文件格式
 
-### 处理
+处理：恢复标准模板后重试 `/status`。
 
-1. 检查 `.agent/memory/evolution/` 目录是否存在
-2. 检查 `.agent/config/agent_config.md` 是否存在
-3. 再执行 `/status`
+## 提交被 pre-commit 阻断
+
+常见原因：
+
+- Flutter 项目下 `flutter analyze` 失败
+- Flutter 项目下 `flutter test` 失败
+- 合并冲突未解决
+
+处理：
+
+1. 先修复 analyze/test 失败
+2. 清理冲突标记后再提交
 
 ## 错误修复循环
 
-### 现象
+现象：同一错误反复出现，自动修复多次失败。
 
-- 同一错误反复出现
-- 自动修复多次失败
+处理：
 
-### 处理
-
-1. 执行 `/analyze-error` 并贴完整日志
-2. 检查 `.agent/memory/project_decisions.md` 的 `Known Issues`
-3. 达到重试上限后：回滚到检查点或标记阻塞
+1. 执行 `/analyze-error` 并保留完整日志
+2. 检查 `project_decisions.md` 的 Known Issues
+3. 达到上限后切换到回滚或 BLOCKED 决策
 
 ## Windows 提示“无法识别 pwsh”
 
-### 现象
+说明：你的环境未安装 PowerShell 7。
 
-- PowerShell 报错：`pwsh` 不是可识别命令
+处理：
 
-### 处理
+1. 直接运行 `.\setup.ps1 -TargetDir "你的项目路径"`
+2. 或安装 PowerShell 7 后再用 `pwsh`
 
-1. 直接执行：`.\setup.ps1 -TargetDir "你的项目路径"`
-2. 或安装 PowerShell 7 后再用：`pwsh .\setup.ps1 ...`
-3. 若执行策略拦截，用：`powershell -ExecutionPolicy Bypass -File .\setup.ps1 ...`
+## `/export` 后找不到导出包
 
-## `/export` 后找不到压缩包
+处理：
 
-### 现象
+1. 先看命令输出的 `Location`
+2. 默认在项目根目录，形如 `axiom-export-YYYYMMDD.zip`
+3. 确认执行命令时当前路径是目标项目
 
-- 提示导出成功，但不知道文件在哪
+## 仍无法解决
 
-### 处理
-
-1. 优先查看导出结果中的 `Location` 绝对路径
-2. 默认输出在项目根目录，文件名形如 `axiom-export-YYYYMMDD.zip`
-3. 若仍找不到，确认触发命令时所在目录是否为目标项目
+- 收集：命令输入、完整错误输出、最近变更文件
+- 进入 `/analyze-error`
+- 必要时执行回滚并附上 checkpoint 信息

@@ -1,22 +1,39 @@
 # Axiom
 
-给 AI 编程助手提供可落地的「记忆 + 流程 + 协作」能力，让它在真实项目里持续可用，而不是每次对话都从零开始。
+![Axiom Logo](./logo.svg)
 
----
+给 AI 编程助手提供可持续的工程化运行环境：让它具备长期记忆、可验证流程和跨工具协作能力，而不是每轮对话都从零开始。
 
-## 这是什么
+## 项目用途
 
-Axiom 是一套可移植的项目内工作系统，核心是 `.agent/` 目录：
+Axiom 的核心目标是把「AI 编码」从一次性问答升级为可管理的研发流程。它主要解决四个问题：
 
-- 记忆层：保存项目决策、用户偏好、当前上下文
-- 流程层：把需求评审、任务拆解、实现与验收串成闭环
-- 协作层：兼容多种 AI 编码工具（Gemini/Claude/Codex/OpenCode/Copilot）
+- **会话遗忘**：通过 `.agent/memory` 持久化项目决策、上下文和偏好。
+- **流程失控**：通过 `.agent/workflows` 强制关键阶段和门禁。
+- **协作不一致**：通过 `.agent/adapters` 统一不同 AI 工具行为。
+- **复盘缺失**：通过 `/reflect` 和 `/evolve` 沉淀经验为可复用知识。
 
-你可以把它理解为：**给 AI 的工程化运行时**。
+## 核心功能
 
----
+- **记忆系统**：保存 `project_decisions.md`、`active_context.md`、用户偏好与演化产物。
+- **流程系统**：覆盖 Draft -> Review -> Decompose -> Implement 全流程。
+- **门禁系统**：在提交、验证、回滚等关键节点做强制检查。
+- **错误恢复**：支持 `/analyze-error` 诊断、自动修复、回滚与阻塞升级。
+- **多工具适配**：支持 Gemini CLI、Claude Code、Codex CLI、OpenCode、Copilot。
 
-## 30 秒安装
+## 30 秒安装（主推安装器）
+
+推荐使用 **Axiom Manager 安装器（GUI）**：
+
+1. 从 Release 下载并安装 Axiom Manager
+2. 启动后选择目标项目目录
+3. 选择 Provider 并执行安装
+
+安装器详细步骤见：`docs/guide/install-and-upgrade.md`
+
+命令行安装仅作为备用方案。
+
+## 命令行安装（备用）
 
 ```bash
 git clone https://github.com/QingJ01/axiom.git
@@ -24,128 +41,63 @@ cd axiom
 
 # macOS / Linux
 bash setup.sh /path/to/your-project
-
-# Windows (PowerShell)
-.\setup.ps1 -TargetDir "D:\your-project"
 ```
 
-若已安装 PowerShell 7，可使用：`pwsh .\setup.ps1 -TargetDir "D:\your-project"`
+```powershell
+# Windows PowerShell
+.\setup.ps1 -TargetDir "D:\your-project"
 
-安装向导会自动完成：
+# 如果你安装了 PowerShell 7，也可用
+pwsh .\setup.ps1 -TargetDir "D:\your-project"
+```
 
-- 拷贝/更新目标项目的 `.agent/`
-- 初始化或保留记忆文件（`project_decisions.md` / `active_context.md` 等）
-- 追加必要的 `.gitignore` 规则
-- 可选安装对应 AI 工具的全局指令文件
-
----
-
-## 快速开始
-
-在你的项目里对 AI 说：
+安装后在目标项目中输入：
 
 ```text
 /start
+/status
 ```
 
-常用指令：
+## 适用与边界
 
-- `/start`：加载记忆和上下文
-- `/status`：查看当前任务与系统状态
-- `/feature-flow`：从需求到交付的完整流程
-- `/analyze-error`：分析并修复错误
-- `/suspend`：保存现场并退出
-- `/reflect` / `/evolve`：复盘与知识沉淀
+适用：
 
----
+- 需要 AI 连续多天协作开发
+- 需求复杂，需要先评审再实现
+- 希望流程可审计、可回滚、可复盘
 
-## 目录结构
+不适用：
 
-```text
-Project Root/
-├── .agent/                      # 唯一事实源（主系统）
-│   ├── memory/                  # 记忆：项目决策/上下文/偏好
-│   ├── workflows/               # 流程定义
-│   ├── adapters/                # 工具适配器
-│   └── ...
-└── docs/                        # 文档与产物
-```
+- 一次性脚本/临时实验
+- 不希望引入流程约束的纯自由对话场景
 
-说明：
+## 文档入口
 
-- `.agent` 是主目录，请以它为准
-
----
-
-## 设计原则
-
-- Manifest-Driven：复杂任务先拆解，再执行
-- Evidence-Based Gates：门禁依赖可验证产物，不靠口头状态
-- Stateless Skills：技能本身尽量无副作用，状态放在 workflow/memory
-- Incremental Delivery：小步迭代、可验证、可回滚
-
----
-
-## 跨平台说明
-
-- 预览文档站：`npm run docs:dev`
-- 生成静态文档：`npm run docs:build`
-- 本地预览构建产物：`npm run docs:preview`
-
----
-
-## 安全与兼容策略（安装器）
-
-当前安装脚本策略：
-
-- 默认采用增量更新，避免粗暴删除目标项目已有目录
-- 覆盖更新前会进行备份与恢复（记忆/配置优先）
-- `.gitignore` 采用规则补齐，避免关键动态文件被误提交
-- 对部分工具提供“跳过全局配置”的推荐路径，减少上下文重复
-
----
-
-## 适用场景
-
-- 需要 AI 连续多天协作开发，而不是一次性问答
-- 需求复杂，必须先评审/拆解再实现
-- 多人/多模型协作，希望行为可追踪、可复盘
-- 希望把经验沉淀为项目长期记忆
-
----
+- 快速开始：`docs/guide/quickstart.md`
+- 安装与升级（详细）：`docs/guide/install-and-upgrade.md`
+- 项目用途与边界：`docs/concepts/purpose-and-scope.md`
+- 功能地图：`docs/concepts/feature-map.md`
+- 系统工作原理：`docs/concepts/how-it-works.md`
+- 原理 Q&A：`docs/concepts/principle-qa.md`
+- 命令参考：`docs/guide/commands.md`
 
 ## 常见问题
 
+### 会污染业务代码吗？
 
-### 会污染我的业务代码吗？
+默认不会。Axiom 主要写入 `.agent/` 和文档目录，对业务代码侵入低。
 
-不会。Axiom 主要落在 `.agent/` 与文档目录，对业务代码侵入很低。
+### 可以逐步接入吗？
 
-### 支持哪些技术栈？
+可以。先从 `/start` + `/status` + `/suspend` 三条命令开始，再逐步使用评审与门禁能力。
 
-安装器内置了 Flutter/React/Vue/Django/Express/Gin 模板，也支持自定义。
+### 如何验证安装成功？
 
-### 支持哪些 AI 工具？
+至少确认：`.agent/` 目录存在、`/status` 可返回状态、安装器执行成功。
 
-当前适配：Gemini CLI、Claude Code、Codex CLI、OpenCode CLI、GitHub Copilot。
+## 灵感来源
 
----
-
-## 开发与贡献
-
-建议流程：
-
-1. 先更新文档与工作流定义
-2. 再改脚本（`setup.ps1` / `setup.sh`）
-3. 最后做跨平台验证（语法 + 冒烟）
-
-最少验证建议：
-
-- `bash -n setup.sh`
-- PowerShell 语法解析 `setup.ps1`
-- `npm run docs:build`
-
----
+- AgentOS: `https://github.com/flockmaster/AgentOS`
 
 ## License
 

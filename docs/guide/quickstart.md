@@ -1,14 +1,14 @@
 # 快速开始
 
-本页目标：10 分钟内把 Axiom 安装进你的项目并跑通第一条任务。
+本页目标：10 分钟完成 Axiom 接入并跑通一条最小闭环任务。
 
 ## 前置条件
 
-- 你已有一个本地项目目录
-- 已安装一个 AI 工具（Gemini/Claude/Codex/OpenCode/Copilot 之一）
-- 推荐安装 Git
+- 已有本地项目目录（建议已初始化 Git）
+- 已安装一个 AI 工具（Gemini/Claude/Codex/OpenCode/Copilot）
+- 已阅读 `guide/install-and-upgrade`
 
-## Step 1: 安装 Axiom
+## Step 1: 安装
 
 ### macOS / Linux
 
@@ -18,7 +18,7 @@ cd axiom
 bash setup.sh /path/to/your-project
 ```
 
-### Windows (PowerShell)
+### Windows PowerShell
 
 ```powershell
 git clone https://github.com/QingJ01/axiom.git
@@ -26,48 +26,47 @@ cd axiom
 .\setup.ps1 -TargetDir "D:\your-project"
 ```
 
-如果你安装了 PowerShell 7，可替代为：
+## Step 2: 验证目录
 
-```powershell
-pwsh .\setup.ps1 -TargetDir "D:\your-project"
-```
-
-## Step 2: 验证安装结果
-
-目标项目根目录应出现：
+目标项目应包含：
 
 - `.agent/`
-- `.gitignore` 中 Axiom 规则
+- `.agent/memory/active_context.md`
+- `.agent/memory/project_decisions.md`
 
 ## Step 3: 启动系统
 
-在你的 AI 对话窗口输入：
+在 AI 会话依次输入：
 
 ```text
 /start
-```
-
-再输入：
-
-```text
 /status
 ```
 
-## Step 4: 跑第一条任务
+若 `/status` 返回状态与任务信息，说明核心链路可用。
 
-直接输入一个明确需求，例如：
+## Step 4: 跑最小任务
+
+输入一个明确需求，例如：
 
 ```text
 实现一个最小登录页，包含邮箱和密码校验，并补充测试。
 ```
 
+执行过程中建议使用：
+
+- `/status` 跟踪阶段
+- `/analyze-error` 处理失败
+- `/suspend` 在中断前保存现场
+
 ## 成功标准
 
-- 能看到系统进入可执行状态（IDLE 或任务状态）
-- 能接收并执行任务
-- 执行过程中产生结构化上下文更新
+- 系统进入可执行状态（IDLE 或任务态）
+- 能持续接收并执行任务
+- 会话中断后可通过 `/start` 恢复现场
 
-## 常见平台问题
+## 常见问题
 
-- Windows 报错“无法识别 `pwsh`”：说明未安装 PowerShell 7，改用 `.\setup.ps1`
-- Linux/macOS 报权限问题：先确认用 `bash setup.sh ...` 启动脚本
+- Windows 报错找不到 `pwsh`：直接使用 `.\setup.ps1`
+- Linux/macOS 权限问题：通过 `bash setup.sh ...` 执行
+- `/status` 信息缺失：检查 `active_context.md` frontmatter 字段

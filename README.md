@@ -2,8 +2,6 @@
 
 ![Axiom Logo](./logo.svg)
 
-在线文档：`https://axiomdocs.vercel.app/`
-
 给 AI 编程助手提供可持续的工程化运行环境：让它具备长期记忆、可验证流程和跨工具协作能力，而不是每轮对话都从零开始。
 
 ## 项目用途
@@ -74,7 +72,7 @@ pwsh .\setup.ps1 -TargetDir "D:\your-project"
 - 不希望引入流程约束的纯自由对话场景
 
 ## 文档入口
-
+[在线文档](https://axiomdocs.vercel.app/)
 - 快速开始：`docs/guide/quickstart.md`
 - 安装与升级（详细）：`docs/guide/install-and-upgrade.md`
 - 项目用途与边界：`docs/concepts/purpose-and-scope.md`

@@ -14,6 +14,7 @@ void main() {
     expect(find.text('AXIOM MANAGER'), findsOneWidget);
     expect(find.text('Axiom Source Path'), findsOneWidget);
     expect(find.text('Target Directory'), findsOneWidget);
+    expect(find.text('Tech Stack'), findsOneWidget);
     expect(find.text('Preview Changes'), findsOneWidget);
     expect(find.text('Inject / Apply'), findsOneWidget);
     expect(find.text('Health Check'), findsOneWidget);

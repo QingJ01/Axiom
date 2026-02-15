@@ -32,12 +32,14 @@ void main() {
 
       final result = await service.sync();
       expect(result.success, isTrue);
-      expect(result.sourcePath.endsWith('res${Platform.pathSeparator}axiom'), isTrue);
+      expect(result.sourcePath.endsWith('res${Platform.pathSeparator}axiom'),
+          isTrue);
       expect(commands.any((c) => c.length >= 3 && c[1] == 'clone'), isTrue);
     });
 
     test('sync should fetch and reset when source exists', () async {
-      final sourceDir = Directory('${sandbox.path}/res/axiom')..createSync(recursive: true);
+      final sourceDir = Directory('${sandbox.path}/res/axiom')
+        ..createSync(recursive: true);
       File('${sourceDir.path}/README.md').writeAsStringSync('x');
       Directory('${sourceDir.path}/.git').createSync(recursive: true);
 
@@ -56,14 +58,17 @@ void main() {
     });
 
     test('sync should stop when local repo is dirty and force=false', () async {
-      final sourceDir = Directory('${sandbox.path}/res/axiom')..createSync(recursive: true);
+      final sourceDir = Directory('${sandbox.path}/res/axiom')
+        ..createSync(recursive: true);
       Directory('${sourceDir.path}/.git').createSync(recursive: true);
 
       final service = AxiomSourceService(
         appDirResolver: () async => sandbox.path,
         runner: (exe, args, {workingDirectory}) async {
           commands.add([exe, ...args]);
-          if (args.length >= 2 && args[0] == 'status' && args[1] == '--porcelain') {
+          if (args.length >= 2 &&
+              args[0] == 'status' &&
+              args[1] == '--porcelain') {
             return ProcessResult(1, 0, 'M README.md\n', '');
           }
           return ProcessResult(1, 0, '', '');
@@ -76,7 +81,8 @@ void main() {
       expect(commands.any((c) => c.length >= 2 && c[1] == 'reset'), isFalse);
     });
 
-    test('sync should continue reset when local repo is dirty and force=true', () async {
+    test('sync should continue reset when local repo is dirty and force=true',
+        () async {
       final sourceDir = Directory('${sandbox.path}/res/axiom')
         ..createSync(recursive: true);
       Directory('${sourceDir.path}/.git').createSync(recursive: true);
@@ -85,7 +91,9 @@ void main() {
         appDirResolver: () async => sandbox.path,
         runner: (exe, args, {workingDirectory}) async {
           commands.add([exe, ...args]);
-          if (args.length >= 2 && args[0] == 'status' && args[1] == '--porcelain') {
+          if (args.length >= 2 &&
+              args[0] == 'status' &&
+              args[1] == '--porcelain') {
             return ProcessResult(1, 0, 'M README.md\n', '');
           }
           return ProcessResult(1, 0, '', '');
@@ -97,12 +105,15 @@ void main() {
       expect(commands.any((c) => c.length >= 2 && c[1] == 'reset'), isTrue);
     });
 
-    test('resolveSourcePath should fallback when preferred path is not writable', () async {
+    test(
+        'resolveSourcePath should fallback when preferred path is not writable',
+        () async {
       final service = AxiomSourceService(
         appDirResolver: () async => '${sandbox.path}/app',
         fallbackDirResolver: () async => '${sandbox.path}/fallback',
         pathWritableChecker: (path) => !path.contains('${sandbox.path}/app'),
-        runner: (exe, args, {workingDirectory}) async => ProcessResult(1, 0, '', ''),
+        runner: (exe, args, {workingDirectory}) async =>
+            ProcessResult(1, 0, '', ''),
       );
 
       final path = await service.resolveSourcePath();
@@ -110,7 +121,8 @@ void main() {
       expect(path.endsWith('res${Platform.pathSeparator}axiom'), isTrue);
     });
 
-    test('sync should fail when source directory exists but is not git repo', () async {
+    test('sync should fail when source directory exists but is not git repo',
+        () async {
       Directory('${sandbox.path}/res/axiom').createSync(recursive: true);
 
       final service = AxiomSourceService(

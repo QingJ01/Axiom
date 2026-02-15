@@ -38,6 +38,13 @@ class InstallEngine {
         reason: 'sync active provider',
       ),
     );
+    items.add(
+      DiffItem(
+        relativePath: '.agent/memory/project_decisions.md',
+        action: DiffAction.update,
+        reason: 'sync selected tech stack profile',
+      ),
+    );
 
     return InstallPlan(items: items);
   }
@@ -90,6 +97,13 @@ class InstallEngine {
       );
       await _healActiveContext(
         config.targetRoot,
+        backupDir,
+        rollbackRecords,
+        applied,
+        failOnRelativePath,
+      );
+      await _updateProjectDecisions(
+        config,
         backupDir,
         rollbackRecords,
         applied,
@@ -260,6 +274,36 @@ class InstallEngine {
     final updated = InstallPolicy.ensureActiveContextFrontmatter(
       file.readAsStringSync(),
     );
+    file.writeAsStringSync(updated);
+    applied.add(relativePath);
+  }
+
+  Future<void> _updateProjectDecisions(
+    InstallConfig config,
+    Directory backupDir,
+    List<RollbackRecord> rollbackRecords,
+    List<String> applied,
+    String? failOnRelativePath,
+  ) async {
+    const relativePath = '.agent/memory/project_decisions.md';
+    final file = File('${config.targetRoot}/$relativePath');
+    await _backupTargetFile(file, relativePath, backupDir, rollbackRecords);
+    if (failOnRelativePath == relativePath) {
+      throw StateError('Injected failure at $relativePath');
+    }
+
+    final profile = resolveTechStack(config.techStackId);
+    final current = file.existsSync() ? file.readAsStringSync() : '';
+    final updated = InstallPolicy.upsertTechStackProfile(
+      current,
+      sdk: profile.sdk,
+      language: profile.language,
+      architecture: profile.architecture,
+      lint: profile.lint,
+      formatting: profile.formatting,
+    );
+
+    file.parent.createSync(recursive: true);
     file.writeAsStringSync(updated);
     applied.add(relativePath);
   }

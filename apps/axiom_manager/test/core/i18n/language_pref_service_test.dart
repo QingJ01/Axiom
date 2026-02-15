@@ -5,7 +5,8 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 void main() {
   group('LanguagePrefService', () {
-    test('load should fallback to system language when no saved value', () async {
+    test('load should fallback to system language when no saved value',
+        () async {
       SharedPreferences.setMockInitialValues(<String, Object>{});
       final service = LanguagePrefService();
 

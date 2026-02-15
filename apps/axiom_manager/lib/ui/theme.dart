@@ -1,13 +1,13 @@
 import 'package:flutter/material.dart';
 
 class AxiomTheme {
-  static const Color primary = Color(0xFF0F172A); // Slate 900
-  static const Color surface = Color(0xFF1E293B); // Slate 800
-  static const Color accent = Color(0xFF38BDF8); // Sky 400
-  static const Color textPrimary = Color(0xFFF1F5F9); // Slate 100
-  static const Color textSecondary = Color(0xFF94A3B8); // Slate 400
-  static const Color success = Color(0xFF22C55E); // Green 500
-  static const Color error = Color(0xFFEF4444); // Red 500
+  static const Color primary = Color(0xFF0B1220);
+  static const Color surface = Color(0xFF111A2C);
+  static const Color accent = Color(0xFF3B82F6);
+  static const Color textPrimary = Color(0xFFF8FAFC);
+  static const Color textSecondary = Color(0xFF9CA3AF);
+  static const Color success = Color(0xFF16A34A);
+  static const Color error = Color(0xFFDC2626);
 
   static ThemeData get darkTheme {
     return ThemeData(
@@ -20,7 +20,7 @@ class AxiomTheme {
         onSurface: textPrimary,
         error: error,
       ),
-      fontFamily: 'Segoe UI', // Windows default, looks clean
+      fontFamily: 'Segoe UI',
       textTheme: const TextTheme(
         headlineMedium: TextStyle(
           color: textPrimary,
@@ -32,31 +32,32 @@ class AxiomTheme {
       ),
       inputDecorationTheme: InputDecorationTheme(
         filled: true,
-        fillColor: surface.withValues(alpha: 0.5),
+        fillColor: surface,
         border: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(12),
+          borderRadius: BorderRadius.circular(10),
           borderSide: BorderSide.none,
         ),
         enabledBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(12),
-          borderSide: BorderSide(color: surface.withValues(alpha: 0.5)),
+          borderRadius: BorderRadius.circular(10),
+          borderSide: const BorderSide(color: Color(0xFF1F2A44)),
         ),
         focusedBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(12),
+          borderRadius: BorderRadius.circular(10),
           borderSide: const BorderSide(color: accent),
         ),
-        contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
+        contentPadding:
+            const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
         labelStyle: TextStyle(color: textSecondary),
-        hintStyle: TextStyle(color: textSecondary.withValues(alpha: 0.5)),
+        hintStyle: TextStyle(color: textSecondary.withValues(alpha: 0.65)),
       ),
       elevatedButtonTheme: ElevatedButtonThemeData(
         style: ElevatedButton.styleFrom(
-          backgroundColor: accent,
-          foregroundColor: primary,
+          backgroundColor: const Color(0xFF2563EB),
+          foregroundColor: Colors.white,
           elevation: 0,
-          padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
+          padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 13),
           shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(12),
+            borderRadius: BorderRadius.circular(10),
           ),
           textStyle: const TextStyle(
             fontWeight: FontWeight.bold,
@@ -67,10 +68,10 @@ class AxiomTheme {
       outlinedButtonTheme: OutlinedButtonThemeData(
         style: OutlinedButton.styleFrom(
           foregroundColor: accent,
-          side: const BorderSide(color: accent),
-          padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
+          side: const BorderSide(color: Color(0xFF2B395A)),
+          padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 13),
           shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(12),
+            borderRadius: BorderRadius.circular(10),
           ),
         ),
       ),

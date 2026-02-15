@@ -24,11 +24,85 @@ class InstallConfig {
     required this.sourceRoot,
     required this.targetRoot,
     required this.activeProvider,
+    required this.techStackId,
   });
 
   final String sourceRoot;
   final String targetRoot;
   final String activeProvider;
+  final String techStackId;
+}
+
+class TechStackProfile {
+  const TechStackProfile({
+    required this.id,
+    required this.display,
+    required this.sdk,
+    required this.language,
+    required this.architecture,
+    required this.lint,
+    required this.formatting,
+  });
+
+  final String id;
+  final String display;
+  final String sdk;
+  final String language;
+  final String architecture;
+  final String lint;
+  final String formatting;
+}
+
+const Map<String, TechStackProfile> kTechStacks = {
+  'flutter': TechStackProfile(
+    id: 'flutter',
+    display: 'Flutter / Dart',
+    sdk: 'Flutter',
+    language: 'Dart',
+    architecture: 'MVVM',
+    lint: 'flutter_lints',
+    formatting: 'dart format',
+  ),
+  'react': TechStackProfile(
+    id: 'react',
+    display: 'React / TypeScript',
+    sdk: 'React',
+    language: 'TypeScript',
+    architecture: 'Component',
+    lint: 'eslint',
+    formatting: 'prettier',
+  ),
+  'vue': TechStackProfile(
+    id: 'vue',
+    display: 'Vue / TypeScript',
+    sdk: 'Vue',
+    language: 'TypeScript',
+    architecture: 'Composition API',
+    lint: 'eslint',
+    formatting: 'prettier',
+  ),
+  'django': TechStackProfile(
+    id: 'django',
+    display: 'Python / Django',
+    sdk: 'Django',
+    language: 'Python',
+    architecture: 'MTV',
+    lint: 'flake8',
+    formatting: 'black',
+  ),
+  'node': TechStackProfile(
+    id: 'node',
+    display: 'Node.js / Express',
+    sdk: 'Node.js',
+    language: 'JavaScript',
+    architecture: 'Layered',
+    lint: 'eslint',
+    formatting: 'prettier',
+  ),
+};
+
+TechStackProfile resolveTechStack(String id) {
+  return kTechStacks[id] ?? kTechStacks['flutter']!;
 }
 
 class RollbackRecord {

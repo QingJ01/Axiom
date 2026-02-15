@@ -69,7 +69,8 @@ last_checkpoint: null
       expect(report.warnings.any((w) => w.contains('status.md')), isTrue);
     });
 
-    test('health check should show actionable message when .agent missing', () async {
+    test('health check should show actionable message when .agent missing',
+        () async {
       Directory('${projectDir.path}/.agent').deleteSync(recursive: true);
 
       final report = await DoctorService().check(projectDir.path);

@@ -8,6 +8,7 @@ import 'package:axiom_manager/i18n/app_language.dart';
 import 'package:axiom_manager/i18n/app_strings.dart';
 import 'package:axiom_manager/i18n/language_pref_service.dart';
 import 'package:axiom_manager/ui/theme.dart';
+import 'package:axiom_manager/ui/widgets/app_logo.dart';
 import 'package:axiom_manager/ui/widgets/axiom_button.dart';
 import 'package:axiom_manager/ui/widgets/glass_container.dart';
 import 'package:axiom_manager/ui/widgets/terminal_output.dart';
@@ -52,7 +53,8 @@ class _MyAppState extends State<MyApp> {
       return;
     }
 
-    final localeCode = WidgetsBinding.instance.platformDispatcher.locale.languageCode;
+    final localeCode =
+        WidgetsBinding.instance.platformDispatcher.locale.languageCode;
     final loaded = await _prefService.load(systemLanguageCode: localeCode);
     if (!mounted) return;
     setState(() {
@@ -145,6 +147,7 @@ class _InstallerHomePageState extends State<InstallerHomePage> {
   final _scrollController = ScrollController();
 
   String _provider = 'gemini_cli';
+  String _techStackId = 'flutter';
   bool _showLegacyProviders = false;
   bool _busy = false;
   String _output = '';
@@ -208,111 +211,91 @@ class _InstallerHomePageState extends State<InstallerHomePage> {
 
   @override
   Widget build(BuildContext context) {
-    final providerOptions = _allProviders
-        .where((p) => _showLegacyProviders || !p.legacy)
-        .toList();
+    final providerOptions =
+        _allProviders.where((p) => _showLegacyProviders || !p.legacy).toList();
 
     return Scaffold(
-      body: Stack(
-        children: [
-          // Background Elements could go here (e.g. stars, gradient mesh)
-          Positioned.fill(
-            child: Container(
-              decoration: BoxDecoration(
-                gradient: RadialGradient(
-                  center: const Alignment(0.8, -0.5),
-                  radius: 1.2,
-                  colors: [
-                    AxiomTheme.accent.withValues(alpha: 0.15),
-                    AxiomTheme.primary,
+      body: SafeArea(
+        child: Padding(
+          padding: const EdgeInsets.all(20.0),
+          child: Column(
+            children: [
+              _buildHeader(),
+              const SizedBox(height: 16),
+              Expanded(
+                child: Row(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    // Left Panel: Configuration
+                    Expanded(
+                      flex: 2,
+                      child: GlassContainer(
+                        opacity: 0.05,
+                        child: SingleChildScrollView(
+                          padding: const EdgeInsets.all(24),
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              _buildSectionTitle('Source Configuration'),
+                              const SizedBox(height: 16),
+                              _buildSourceInput(),
+                              const SizedBox(height: 24),
+                              _buildSectionTitle('Target Project'),
+                              const SizedBox(height: 16),
+                              _buildTargetInput(),
+                              const SizedBox(height: 24),
+                              _buildSectionTitle('Tech Stack'),
+                              const SizedBox(height: 16),
+                              _buildTechStackSelector(),
+                              const SizedBox(height: 24),
+                              _buildSectionTitle('AI Provider'),
+                              const SizedBox(height: 16),
+                              _buildProviderSelector(providerOptions),
+                              const SizedBox(height: 32),
+                              const Divider(color: Colors.white10),
+                              const SizedBox(height: 24),
+                              _buildActionButtons(),
+                            ],
+                          ),
+                        ),
+                      ),
+                    ),
+
+                    const SizedBox(width: 24),
+
+                    // Right Panel: Terminal
+                    Expanded(
+                      flex: 3,
+                      child: Column(
+                        children: [
+                          Expanded(
+                            child: TerminalOutput(
+                              output: _output,
+                              scrollController: _scrollController,
+                            ),
+                          ),
+                          const SizedBox(height: 12),
+                          Align(
+                            alignment: Alignment.centerRight,
+                            child: TextButton.icon(
+                              onPressed: _clearLog,
+                              icon:
+                                  const Icon(Icons.cleaning_services, size: 16),
+                              label: Text(_strings.t('clearConsole')),
+                              style: TextButton.styleFrom(
+                                foregroundColor: AxiomTheme.textSecondary,
+                              ),
+                            ),
+                          )
+                        ],
+                      ),
+                    ),
                   ],
                 ),
               ),
-            ),
+            ],
           ),
-          
-          SafeArea(
-            child: Padding(
-              padding: const EdgeInsets.all(24.0),
-              child: Column(
-                children: [
-                   _buildHeader(),
-                   const SizedBox(height: 24),
-                   Expanded(
-                     child: Row(
-                       crossAxisAlignment: CrossAxisAlignment.start,
-                       children: [
-                         // Left Panel: Configuration
-                         Expanded(
-                           flex: 2,
-                           child: GlassContainer(
-                             opacity: 0.05,
-                             child: SingleChildScrollView(
-                               padding: const EdgeInsets.all(24),
-                               child: Column(
-                                 crossAxisAlignment: CrossAxisAlignment.start,
-                                 children: [
-                                   _buildSectionTitle('Source Configuration'),
-                                   const SizedBox(height: 16),
-                                   _buildSourceInput(),
-                                   const SizedBox(height: 24),
-                                   
-                                   _buildSectionTitle('Target Project'),
-                                   const SizedBox(height: 16),
-                                   _buildTargetInput(),
-                                   const SizedBox(height: 24),
-
-                                   _buildSectionTitle('AI Provider'),
-                                   const SizedBox(height: 16),
-                                   _buildProviderSelector(providerOptions),
-                                   
-                                   const SizedBox(height: 32),
-                                   const Divider(color: Colors.white10),
-                                   const SizedBox(height: 24),
-                                   
-                                   _buildActionButtons(),
-                                 ],
-                               ),
-                             ),
-                           ),
-                         ),
-                         
-                         const SizedBox(width: 24),
-                         
-                         // Right Panel: Terminal
-                         Expanded(
-                           flex: 3,
-                           child: Column(
-                             children: [
-                               Expanded(
-                                 child: TerminalOutput(
-                                   output: _output, 
-                                   scrollController: _scrollController,
-                                 ),
-                               ),
-                               const SizedBox(height: 12),
-                                Align(
-                                  alignment: Alignment.centerRight,
-                                  child: TextButton.icon(
-                                    onPressed: _clearLog,
-                                    icon: const Icon(Icons.cleaning_services, size: 16),
-                                    label: Text(_strings.t('clearConsole')),
-                                    style: TextButton.styleFrom(
-                                      foregroundColor: AxiomTheme.textSecondary,
-                                    ),
-                                  ),
-                               )
-                             ],
-                           ),
-                         ),
-                       ],
-                     ),
-                   ),
-                ],
-              ),
-            ),
-          ),
-        ],
+        ),
       ),
     );
   }
@@ -320,8 +303,8 @@ class _InstallerHomePageState extends State<InstallerHomePage> {
   Widget _buildHeader() {
     return Row(
       children: [
-        Icon(Icons.token, size: 32, color: AxiomTheme.accent),
-        const SizedBox(width: 12),
+        const AppLogo(size: 34),
+        const SizedBox(width: 10),
         Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
@@ -332,9 +315,9 @@ class _InstallerHomePageState extends State<InstallerHomePage> {
             Text(
               'v1.0.0+1 | System State: ONLINE',
               style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                color: AxiomTheme.accent.withValues(alpha: 0.7),
-                letterSpacing: 1,
-              ),
+                    color: AxiomTheme.accent.withValues(alpha: 0.7),
+                    letterSpacing: 1,
+                  ),
             ),
           ],
         ),
@@ -436,38 +419,79 @@ class _InstallerHomePageState extends State<InstallerHomePage> {
               child: Text(p.id),
             );
           }).toList(),
-          onChanged: _busy ? null : (value) {
-            if (value == null) return;
-            setState(() {
-              _provider = value;
-              final selected = _allProviders.firstWhere((p) => p.id == value);
-              if (selected.note.isNotEmpty) {
-                 _log('[INFO] Provider selected: ${selected.id}');
-                 _log('[NOTE] ${selected.note}');
-              } else {
-                 _log('[INFO] Provider switched to: ${selected.id}');
-              }
-            });
-          },
+          onChanged: _busy
+              ? null
+              : (value) {
+                  if (value == null) return;
+                  setState(() {
+                    _provider = value;
+                    final selected =
+                        _allProviders.firstWhere((p) => p.id == value);
+                    if (selected.note.isNotEmpty) {
+                      _log('[INFO] Provider selected: ${selected.id}');
+                      _log('[NOTE] ${selected.note}');
+                    } else {
+                      _log('[INFO] Provider switched to: ${selected.id}');
+                    }
+                  });
+                },
         ),
         const SizedBox(height: 8),
         CheckboxListTile(
           value: _showLegacyProviders,
-          onChanged: _busy ? null : (value) {
-            setState(() {
-              _showLegacyProviders = value ?? false;
-              if (!_showLegacyProviders && (_provider == 'gemini' || _provider == 'claude')) {
-                _provider = _provider == 'gemini' ? 'gemini_cli' : 'claude_code';
-                _log('[WARN] Legacy provider hidden. Auto-switched to $_provider');
-              }
-            });
-          },
+          onChanged: _busy
+              ? null
+              : (value) {
+                  setState(() {
+                    _showLegacyProviders = value ?? false;
+                    if (!_showLegacyProviders &&
+                        (_provider == 'gemini' || _provider == 'claude')) {
+                      _provider =
+                          _provider == 'gemini' ? 'gemini_cli' : 'claude_code';
+                      _log(
+                          '[WARN] Legacy provider hidden. Auto-switched to $_provider');
+                    }
+                  });
+                },
           title: Text(_strings.t('showLegacy')),
           controlAffinity: ListTileControlAffinity.leading,
           dense: true,
           contentPadding: EdgeInsets.zero,
         ),
       ],
+    );
+  }
+
+  Widget _buildTechStackSelector() {
+    final options = kTechStacks.values.toList();
+    return DropdownButtonFormField<String>(
+      value: _techStackId,
+      isExpanded: true,
+      decoration: InputDecoration(
+        prefixIcon: const Icon(Icons.integration_instructions_outlined),
+        labelText: _strings.t('techStack'),
+      ),
+      dropdownColor: AxiomTheme.surface,
+      items: options
+          .map(
+            (stack) => DropdownMenuItem<String>(
+              value: stack.id,
+              child: Text(stack.display),
+            ),
+          )
+          .toList(),
+      onChanged: _busy
+          ? null
+          : (value) {
+              if (value == null) {
+                return;
+              }
+              setState(() {
+                _techStackId = value;
+              });
+              _log(
+                  '[INFO] Tech stack switched to: ${resolveTechStack(value).display}');
+            },
     );
   }
 
@@ -511,12 +535,23 @@ class _InstallerHomePageState extends State<InstallerHomePage> {
   }
 
   Future<void> _pickTargetDirectory() async {
-    final dir = await _directoryPicker();
-    if (dir == null || dir.trim().isEmpty) return;
-    setState(() {
-      _targetController.text = dir;
-    });
-    _log('Target directory selected: $dir');
+    try {
+      final dir = await _directoryPicker();
+      if (dir == null) {
+        _log('[INFO] Directory selection canceled.');
+        return;
+      }
+      if (dir.trim().isEmpty) {
+        _log('[WARN] Empty directory path returned.');
+        return;
+      }
+      setState(() {
+        _targetController.text = dir;
+      });
+      _log('Target directory selected: $dir');
+    } catch (e) {
+      _log('[ERROR] Directory picker failed: $e');
+    }
   }
 
   Future<void> _forceSync() async {
@@ -548,6 +583,7 @@ class _InstallerHomePageState extends State<InstallerHomePage> {
       sourceRoot: _sourceController.text.trim(),
       targetRoot: _targetController.text.trim(),
       activeProvider: _provider,
+      techStackId: _techStackId,
     );
   }
 
@@ -572,7 +608,8 @@ class _InstallerHomePageState extends State<InstallerHomePage> {
   Future<bool> _ensureSourceReady() async {
     final sourceRoot = _sourceController.text.trim();
     if (sourceRoot.isEmpty) {
-      _log('[ERROR] Axiom source directory not initialized. Please sync first.');
+      _log(
+          '[ERROR] Axiom source directory not initialized. Please sync first.');
       return false;
     }
 
@@ -587,7 +624,7 @@ class _InstallerHomePageState extends State<InstallerHomePage> {
     setState(() {
       _sourceController.text = result.sourcePath;
     });
-     _log(result.message);
+    _log(result.message);
     return result.success;
   }
 
@@ -603,27 +640,27 @@ class _InstallerHomePageState extends State<InstallerHomePage> {
       if (!ready) return;
 
       final plan = await _engine.plan(_config());
-      
+
       _log('--- PREVIEW REPORT ---');
       _log('Total Items: ${plan.items.length}');
-      
+
       final grouped = <DiffAction, int>{
         DiffAction.create: 0,
         DiffAction.update: 0,
         DiffAction.skip: 0,
       };
-      
+
       for (final item in plan.items) {
         grouped[item.action] = (grouped[item.action] ?? 0) + 1;
         if (item.action != DiffAction.skip) {
-           // Highlight changes
-           _log('[${item.action.name.toUpperCase()}] ${item.relativePath}');
+          // Highlight changes
+          _log('[${item.action.name.toUpperCase()}] ${item.relativePath}');
         }
       }
-      
-      _log('Summary: Create(${grouped[DiffAction.create]}) Update(${grouped[DiffAction.update]}) Skip(${grouped[DiffAction.skip]})');
+
+      _log(
+          'Summary: Create(${grouped[DiffAction.create]}) Update(${grouped[DiffAction.update]}) Skip(${grouped[DiffAction.skip]})');
       _log('----------------------');
-      
     } catch (e) {
       _log('[CRITICAL] Preview failed: $e');
     } finally {
@@ -649,14 +686,14 @@ class _InstallerHomePageState extends State<InstallerHomePage> {
         _log('[SUCCESS] Installation verified.');
         _log('Changed files:');
         for (var file in result.applied) {
-           _log(' + $file');
+          _log(' + $file');
         }
       } else {
         _log('[FAILED] Installation failed.');
         _log('Error: ${result.error ?? 'Unknown error'}');
       }
     } catch (e) {
-       _log('[CRITICAL] Exception during install: $e');
+      _log('[CRITICAL] Exception during install: $e');
     } finally {
       setState(() {
         _busy = false;
@@ -680,7 +717,7 @@ class _InstallerHomePageState extends State<InstallerHomePage> {
       final report = await _doctor.check(target);
       _log('--- DOCTOR REPORT ---');
       _log('Status: ${report.ok ? 'HEALTHY' : 'ISSUES FOUND'}');
-      
+
       if (report.errors.isNotEmpty) {
         for (var e in report.errors) {
           _log('[ERROR] $e');
@@ -692,7 +729,7 @@ class _InstallerHomePageState extends State<InstallerHomePage> {
         }
       }
       if (report.ok) {
-         _log('No critical issues found.');
+        _log('No critical issues found.');
       }
       _log('---------------------');
     } catch (e) {

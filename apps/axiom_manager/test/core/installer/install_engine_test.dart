@@ -38,7 +38,8 @@ task_status: IDLE
 
       final binaryDir = Directory('${sourceDir.path}/.agent/assets')
         ..createSync(recursive: true);
-      File('${binaryDir.path}/icon.bin').writeAsBytesSync(const <int>[0, 1, 2, 255]);
+      File('${binaryDir.path}/icon.bin')
+          .writeAsBytesSync(const <int>[0, 1, 2, 255]);
 
       engine = InstallEngine();
     });
@@ -55,6 +56,7 @@ task_status: IDLE
           sourceRoot: sourceDir.path,
           targetRoot: targetDir.path,
           activeProvider: 'gemini_cli',
+          techStackId: 'flutter',
         ),
       );
 
@@ -73,6 +75,7 @@ task_status: IDLE
           sourceRoot: sourceDir.path,
           targetRoot: targetDir.path,
           activeProvider: 'opencode',
+          techStackId: 'react',
         ),
       );
 
@@ -83,11 +86,16 @@ task_status: IDLE
         ).existsSync(),
         isTrue,
       );
-      final configText =
-          File(
-            '${targetDir.path}/.agent/config/agent_config.md',
-          ).readAsStringSync();
+      final configText = File(
+        '${targetDir.path}/.agent/config/agent_config.md',
+      ).readAsStringSync();
       expect(configText.contains('ACTIVE_PROVIDER: opencode'), isTrue);
+
+      final decisionsText = File(
+        '${targetDir.path}/.agent/memory/project_decisions.md',
+      ).readAsStringSync();
+      expect(decisionsText.contains('- SDK: React'), isTrue);
+      expect(decisionsText.contains('- Language: TypeScript'), isTrue);
     });
 
     test('apply should rollback on write failure', () async {
@@ -100,15 +108,15 @@ task_status: IDLE
           sourceRoot: sourceDir.path,
           targetRoot: targetDir.path,
           activeProvider: 'gemini_cli',
+          techStackId: 'flutter',
         ),
         failOnRelativePath: '.agent/memory/active_context.md',
       );
 
       expect(result.success, isFalse);
-      final restored =
-          File(
-            '${targetDir.path}/.agent/memory/project_decisions.md',
-          ).readAsStringSync();
+      final restored = File(
+        '${targetDir.path}/.agent/memory/project_decisions.md',
+      ).readAsStringSync();
       expect(restored, 'old');
     });
 
@@ -124,6 +132,7 @@ task_status: IDLE
           sourceRoot: sourceDir.path,
           targetRoot: targetDir.path,
           activeProvider: 'gemini_cli',
+          techStackId: 'flutter',
         ),
       );
 

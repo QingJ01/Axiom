@@ -26,10 +26,12 @@ class AxiomSourceService {
     Future<String> Function()? appDirResolver,
     Future<String> Function()? fallbackDirResolver,
     bool Function(String path)? pathWritableChecker,
-  }) : _runner = runner ?? _defaultRunner,
-       _appDirResolver = appDirResolver ?? _defaultAppDirResolver,
-       _fallbackDirResolver = fallbackDirResolver ?? _defaultFallbackDirResolver,
-       _pathWritableChecker = pathWritableChecker ?? _defaultPathWritableChecker;
+  })  : _runner = runner ?? _defaultRunner,
+        _appDirResolver = appDirResolver ?? _defaultAppDirResolver,
+        _fallbackDirResolver =
+            fallbackDirResolver ?? _defaultFallbackDirResolver,
+        _pathWritableChecker =
+            pathWritableChecker ?? _defaultPathWritableChecker;
 
   final String repoUrl;
   final String branch;
@@ -57,9 +59,11 @@ class AxiomSourceService {
     resDir.createSync(recursive: true);
 
     try {
-      final gitDir = Directory('${sourceDir.path}${Platform.pathSeparator}.git');
+      final gitDir =
+          Directory('${sourceDir.path}${Platform.pathSeparator}.git');
       if (!sourceDir.existsSync()) {
-        await _runGit(<String>['clone', '--branch', branch, repoUrl, sourcePath]);
+        await _runGit(
+            <String>['clone', '--branch', branch, repoUrl, sourcePath]);
         return SourceSyncResult(
           success: true,
           sourcePath: sourcePath,
@@ -78,7 +82,8 @@ class AxiomSourceService {
         if (sourceDir.existsSync()) {
           sourceDir.deleteSync(recursive: true);
         }
-        await _runGit(<String>['clone', '--branch', branch, repoUrl, sourcePath]);
+        await _runGit(
+            <String>['clone', '--branch', branch, repoUrl, sourcePath]);
         return SourceSyncResult(
           success: true,
           sourcePath: sourcePath,
@@ -127,7 +132,8 @@ class AxiomSourceService {
     List<String> args, {
     String? workingDirectory,
   }) async {
-    final result = await _runner('git', args, workingDirectory: workingDirectory);
+    final result =
+        await _runner('git', args, workingDirectory: workingDirectory);
     if (result.exitCode != 0) {
       throw StateError('git ${args.join(' ')} failed: ${result.stderr}');
     }

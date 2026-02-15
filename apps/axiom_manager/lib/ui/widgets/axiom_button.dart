@@ -20,17 +20,16 @@ class AxiomButton extends StatelessWidget {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final colorScheme = theme.colorScheme;
-    
+
     final style = isPrimary
         ? ElevatedButton.styleFrom(
-            backgroundColor: colorScheme.primary, // This is Accent (Sky 400)
-            foregroundColor: const Color(0xFF0F172A), // Dark text on bright button
-            elevation: 4,
-            shadowColor: colorScheme.primary.withValues(alpha: 0.4),
+            backgroundColor: const Color(0xFF2563EB),
+            foregroundColor: Colors.white,
+            elevation: 0,
           )
         : OutlinedButton.styleFrom(
-            foregroundColor: colorScheme.primary,
-            side: BorderSide(color: colorScheme.primary.withValues(alpha: 0.5)),
+            foregroundColor: colorScheme.onSurface,
+            side: const BorderSide(color: Color(0xFF2B395A)),
           );
 
     return SizedBox(

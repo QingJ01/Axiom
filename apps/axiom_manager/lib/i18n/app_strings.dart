@@ -15,6 +15,7 @@ class AppStrings {
     'healthCheck': 'Health Check',
     'showLegacy': 'Show Legacy Providers',
     'activeProvider': 'Active Provider',
+    'techStack': 'Tech Stack',
     'clearConsole': 'Clear Console',
     'syncSource': 'Sync Source',
     'browse': 'Browse...',
@@ -24,7 +25,8 @@ class AppStrings {
     'logTargetRequired': 'Target project directory is empty.',
     'logSourceRequired': 'Axiom Source Path is empty. Please sync.',
     'forceSync': 'Force Update',
-    'forceSyncConfirm': 'Force update will discard local changes under /res/axiom. Continue?',
+    'forceSyncConfirm':
+        'Force update will discard local changes under /res/axiom. Continue?',
   };
 
   static const Map<String, String> _zh = {
@@ -37,6 +39,7 @@ class AppStrings {
     'healthCheck': '健康检查',
     'showLegacy': '显示兼容 Provider',
     'activeProvider': '当前 Provider',
+    'techStack': '技术栈',
     'clearConsole': '清空终端',
     'syncSource': '同步源仓库',
     'browse': '浏览...',

@@ -81,4 +81,48 @@ class InstallPolicy {
 
     return '---\n${merged.join('\n')}\n---\n${content.substring(end + 5)}';
   }
+
+  static String upsertTechStackProfile(
+    String content, {
+    required String sdk,
+    required String language,
+    required String architecture,
+    required String lint,
+    required String formatting,
+  }) {
+    const startMarker = '<!-- AUTO-GENERATED CONTEXT START -->';
+    const endMarker = '<!-- AUTO-GENERATED CONTEXT END -->';
+
+    final block = '''$startMarker
+## 📌 项目上下文 (自动同步)
+
+### 技术栈
+
+- SDK: $sdk
+- Language: $language
+
+### 架构设计
+
+- Pattern: $architecture
+
+### 编码规范
+
+- Lint: $lint
+- Formatting: $formatting
+$endMarker''';
+
+    final start = content.indexOf(startMarker);
+    final end = content.indexOf(endMarker);
+    if (start >= 0 && end > start) {
+      final tailStart = end + endMarker.length;
+      return '${content.substring(0, start)}$block${content.substring(tailStart)}';
+    }
+
+    if (content.trim().isEmpty) {
+      return '# Project Decisions\n\n$block\n';
+    }
+
+    final sep = content.endsWith('\n') ? '' : '\n';
+    return '$content$sep\n$block\n';
+  }
 }

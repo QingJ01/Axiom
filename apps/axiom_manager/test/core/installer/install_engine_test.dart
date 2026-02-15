@@ -141,5 +141,55 @@ task_status: IDLE
       );
       expect(item.action, DiffAction.skip);
     });
+
+    test('apply should create active_context when source file is missing',
+        () async {
+      File('${sourceDir.path}/.agent/memory/active_context.md').deleteSync();
+
+      final result = await engine.apply(
+        InstallConfig(
+          sourceRoot: sourceDir.path,
+          targetRoot: targetDir.path,
+          activeProvider: 'gemini_cli',
+          techStackId: 'flutter',
+        ),
+      );
+
+      expect(result.success, isTrue);
+      final created = File('${targetDir.path}/.agent/memory/active_context.md');
+      expect(created.existsSync(), isTrue);
+      final text = created.readAsStringSync();
+      expect(text.contains('session_id:'), isTrue);
+      expect(text.contains('task_status:'), isTrue);
+    });
+
+    test('apply should write custom tech stack values for other option',
+        () async {
+      final result = await engine.apply(
+        InstallConfig(
+          sourceRoot: sourceDir.path,
+          targetRoot: targetDir.path,
+          activeProvider: 'opencode',
+          techStackId: 'other',
+          customTechStack: const TechStackProfile(
+            id: 'other',
+            display: 'Custom',
+            sdk: 'Rust',
+            language: 'Rust',
+            architecture: 'Hexagonal',
+            lint: 'clippy',
+            formatting: 'rustfmt',
+          ),
+        ),
+      );
+
+      expect(result.success, isTrue);
+      final decisionsText = File(
+        '${targetDir.path}/.agent/memory/project_decisions.md',
+      ).readAsStringSync();
+      expect(decisionsText.contains('- SDK: Rust'), isTrue);
+      expect(decisionsText.contains('- Pattern: Hexagonal'), isTrue);
+      expect(decisionsText.contains('- Lint: clippy'), isTrue);
+    });
   });
 }

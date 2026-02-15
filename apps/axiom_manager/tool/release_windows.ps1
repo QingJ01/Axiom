@@ -2,7 +2,8 @@ param(
     [ValidateSet("unsigned", "signed")]
     [string]$Mode = "unsigned",
     [string]$BuildName = "1.0.0",
-    [string]$BuildNumber = "1"
+    [string]$BuildNumber = "1",
+    [bool]$Clean = $true
 )
 
 $ErrorActionPreference = "Stop"
@@ -25,6 +26,11 @@ $ZipPath = Join-Path $ReleaseDir "axiom-manager-windows-$Mode.zip"
 Write-Host "[1/4] flutter pub get"
 Push-Location $ProjectRoot
 try {
+    if ($Clean) {
+        Write-Host "[prep] flutter clean (refresh icon resources)"
+        flutter clean
+    }
+
     flutter pub get
 
     Write-Host "[2/4] build windows release"

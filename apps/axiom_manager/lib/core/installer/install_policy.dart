@@ -82,6 +82,21 @@ class InstallPolicy {
     return '---\n${merged.join('\n')}\n---\n${content.substring(end + 5)}';
   }
 
+  static String defaultActiveContext() {
+    return '''---
+session_id: null
+task_status: IDLE
+auto_fix_attempts: 0
+last_checkpoint: null
+---
+
+# Active Context
+
+current_task: null
+notes: []
+''';
+  }
+
   static String upsertTechStackProfile(
     String content, {
     required String sdk,

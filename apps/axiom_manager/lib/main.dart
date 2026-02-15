@@ -144,6 +144,11 @@ class _InstallerHomePageState extends State<InstallerHomePage> {
 
   final _sourceController = TextEditingController();
   final _targetController = TextEditingController();
+  final _customSdkController = TextEditingController();
+  final _customLanguageController = TextEditingController();
+  final _customArchitectureController = TextEditingController();
+  final _customLintController = TextEditingController();
+  final _customFormattingController = TextEditingController();
   final _scrollController = ScrollController();
 
   String _provider = 'gemini_cli';
@@ -169,6 +174,11 @@ class _InstallerHomePageState extends State<InstallerHomePage> {
   void dispose() {
     _sourceController.dispose();
     _targetController.dispose();
+    _customSdkController.dispose();
+    _customLanguageController.dispose();
+    _customArchitectureController.dispose();
+    _customLintController.dispose();
+    _customFormattingController.dispose();
     _scrollController.dispose();
     super.dispose();
   }
@@ -247,6 +257,10 @@ class _InstallerHomePageState extends State<InstallerHomePage> {
                               _buildSectionTitle('Tech Stack'),
                               const SizedBox(height: 16),
                               _buildTechStackSelector(),
+                              if (_techStackId == 'other') ...[
+                                const SizedBox(height: 12),
+                                _buildCustomTechStackInputs(),
+                              ],
                               const SizedBox(height: 24),
                               _buildSectionTitle('AI Provider'),
                               const SizedBox(height: 16),
@@ -495,6 +509,50 @@ class _InstallerHomePageState extends State<InstallerHomePage> {
     );
   }
 
+  Widget _buildCustomTechStackInputs() {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          _strings.t('customTechStack').toUpperCase(),
+          style: TextStyle(
+            fontSize: 11,
+            fontWeight: FontWeight.w600,
+            color: AxiomTheme.textSecondary,
+            letterSpacing: 1,
+          ),
+        ),
+        const SizedBox(height: 10),
+        TextField(
+          controller: _customSdkController,
+          decoration: InputDecoration(labelText: _strings.t('customSdk')),
+        ),
+        const SizedBox(height: 8),
+        TextField(
+          controller: _customLanguageController,
+          decoration: InputDecoration(labelText: _strings.t('customLanguage')),
+        ),
+        const SizedBox(height: 8),
+        TextField(
+          controller: _customArchitectureController,
+          decoration:
+              InputDecoration(labelText: _strings.t('customArchitecture')),
+        ),
+        const SizedBox(height: 8),
+        TextField(
+          controller: _customLintController,
+          decoration: InputDecoration(labelText: _strings.t('customLint')),
+        ),
+        const SizedBox(height: 8),
+        TextField(
+          controller: _customFormattingController,
+          decoration:
+              InputDecoration(labelText: _strings.t('customFormatting')),
+        ),
+      ],
+    );
+  }
+
   Widget _buildActionButtons() {
     return Wrap(
       spacing: 12,
@@ -579,11 +637,29 @@ class _InstallerHomePageState extends State<InstallerHomePage> {
   }
 
   InstallConfig _config() {
+    TechStackProfile? custom;
+    if (_techStackId == 'other') {
+      custom = TechStackProfile(
+        id: 'other',
+        display: _strings.t('customTechStack'),
+        sdk: _customSdkController.text.trim(),
+        language: _customLanguageController.text.trim(),
+        architecture: _customArchitectureController.text.trim(),
+        lint: _customLintController.text.trim().isEmpty
+            ? 'N/A'
+            : _customLintController.text.trim(),
+        formatting: _customFormattingController.text.trim().isEmpty
+            ? 'N/A'
+            : _customFormattingController.text.trim(),
+      );
+    }
+
     return InstallConfig(
       sourceRoot: _sourceController.text.trim(),
       targetRoot: _targetController.text.trim(),
       activeProvider: _provider,
       techStackId: _techStackId,
+      customTechStack: custom,
     );
   }
 
@@ -749,6 +825,14 @@ class _InstallerHomePageState extends State<InstallerHomePage> {
     if (_sourceController.text.trim().isEmpty) {
       _log('[ERROR] ${_strings.t('logSourceRequired')}');
       return false;
+    }
+    if (_techStackId == 'other') {
+      if (_customSdkController.text.trim().isEmpty ||
+          _customLanguageController.text.trim().isEmpty ||
+          _customArchitectureController.text.trim().isEmpty) {
+        _log('[ERROR] ${_strings.t('logCustomTechRequired')}');
+        return false;
+      }
     }
     return true;
   }

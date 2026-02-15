@@ -54,4 +54,21 @@ void main() {
     expect(find.text('预览变更'), findsOneWidget);
     expect(find.text('执行导入'), findsOneWidget);
   });
+
+  testWidgets('tech stack should support other and show custom inputs', (
+    WidgetTester tester,
+  ) async {
+    await tester.pumpWidget(
+      const MyApp(forcedLanguage: AppLanguage.en, persistLanguage: false),
+    );
+
+    await tester.tap(find.text('Flutter / Dart').first);
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('Other / Custom').last);
+    await tester.pumpAndSettle();
+
+    expect(find.text('Custom SDK'), findsOneWidget);
+    expect(find.text('Custom Language'), findsOneWidget);
+    expect(find.text('Custom Architecture'), findsOneWidget);
+  });
 }

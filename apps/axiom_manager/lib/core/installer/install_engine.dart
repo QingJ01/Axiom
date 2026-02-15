@@ -264,16 +264,16 @@ class InstallEngine {
   ) async {
     const relativePath = '.agent/memory/active_context.md';
     final file = File('$targetRoot/$relativePath');
-    if (!file.existsSync()) return;
-
     await _backupTargetFile(file, relativePath, backupDir, rollbackRecords);
     if (failOnRelativePath == relativePath) {
       throw StateError('Injected failure at $relativePath');
     }
 
-    final updated = InstallPolicy.ensureActiveContextFrontmatter(
-      file.readAsStringSync(),
-    );
+    final current = file.existsSync()
+        ? file.readAsStringSync()
+        : InstallPolicy.defaultActiveContext();
+    final updated = InstallPolicy.ensureActiveContextFrontmatter(current);
+    file.parent.createSync(recursive: true);
     file.writeAsStringSync(updated);
     applied.add(relativePath);
   }
@@ -292,7 +292,10 @@ class InstallEngine {
       throw StateError('Injected failure at $relativePath');
     }
 
-    final profile = resolveTechStack(config.techStackId);
+    final profile =
+        (config.techStackId == 'other' && config.customTechStack != null)
+            ? config.customTechStack!
+            : resolveTechStack(config.techStackId);
     final current = file.existsSync() ? file.readAsStringSync() : '';
     final updated = InstallPolicy.upsertTechStackProfile(
       current,

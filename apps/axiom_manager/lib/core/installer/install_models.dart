@@ -25,12 +25,14 @@ class InstallConfig {
     required this.targetRoot,
     required this.activeProvider,
     required this.techStackId,
+    this.customTechStack,
   });
 
   final String sourceRoot;
   final String targetRoot;
   final String activeProvider;
   final String techStackId;
+  final TechStackProfile? customTechStack;
 }
 
 class TechStackProfile {
@@ -98,6 +100,15 @@ const Map<String, TechStackProfile> kTechStacks = {
     architecture: 'Layered',
     lint: 'eslint',
     formatting: 'prettier',
+  ),
+  'other': TechStackProfile(
+    id: 'other',
+    display: 'Other / Custom',
+    sdk: 'Custom',
+    language: 'Custom',
+    architecture: 'Custom',
+    lint: 'N/A',
+    formatting: 'N/A',
   ),
 };
 

@@ -36,7 +36,33 @@ if ($conflictFound) {
     exit 1
 }
 
-# ── 3. 检查 .agent/ 中的 TODO/FIXME ──
+# ── 3. CI Gate (Flutter analyze + test) ──
+if (Test-Path "pubspec.yaml") {
+    $flutterCmd = Get-Command flutter -ErrorAction SilentlyContinue
+    if ($null -eq $flutterCmd) {
+        Write-Host "" 
+        Write-Host "❌ [$GUARD_NAME] 检测到 Flutter 项目，但未找到 flutter 命令。" -ForegroundColor Red
+        Write-Host "   请先安装 Flutter 并确保 flutter analyze / flutter test 可用。" -ForegroundColor Red
+        Write-Host ""
+        exit 1
+    }
+
+    Write-Host "🔍 [$GUARD_NAME] 运行 flutter analyze ..." -ForegroundColor Cyan
+    & flutter analyze
+    if ($LASTEXITCODE -ne 0) {
+        Write-Host "❌ [$GUARD_NAME] flutter analyze 失败，已阻断提交。" -ForegroundColor Red
+        exit 1
+    }
+
+    Write-Host "🧪 [$GUARD_NAME] 运行 flutter test ..." -ForegroundColor Cyan
+    & flutter test
+    if ($LASTEXITCODE -ne 0) {
+        Write-Host "❌ [$GUARD_NAME] flutter test 失败，已阻断提交。" -ForegroundColor Red
+        exit 1
+    }
+}
+
+# ── 4. 检查 .agent/ 中的 TODO/FIXME ──
 $agentFiles = $stagedFiles | Where-Object { $_ -like ".agent/*" -or $_ -like ".agent\*" }
 foreach ($file in $agentFiles) {
     if (Test-Path $file) {

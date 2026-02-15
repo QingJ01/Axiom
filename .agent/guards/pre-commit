@@ -32,7 +32,30 @@ if [ -n "$CONFLICT_FILES" ]; then
     exit 1  # 冲突必须阻断
 fi
 
-# ── 3. 检查 .agent/ 目录中是否有 TODO/FIXME 标记 ──
+# ── 3. CI Gate (Flutter analyze + test) ──
+if [ -f "pubspec.yaml" ]; then
+    if ! command -v flutter >/dev/null 2>&1; then
+        echo ""
+        echo "❌ [$GUARD_NAME] 检测到 Flutter 项目，但未找到 flutter 命令。"
+        echo "   请先安装 Flutter 并确保 flutter analyze / flutter test 可用。"
+        echo ""
+        exit 1
+    fi
+
+    echo "🔍 [$GUARD_NAME] 运行 flutter analyze ..."
+    if ! flutter analyze; then
+        echo "❌ [$GUARD_NAME] flutter analyze 失败，已阻断提交。"
+        exit 1
+    fi
+
+    echo "🧪 [$GUARD_NAME] 运行 flutter test ..."
+    if ! flutter test; then
+        echo "❌ [$GUARD_NAME] flutter test 失败，已阻断提交。"
+        exit 1
+    fi
+fi
+
+# ── 4. 检查 .agent/ 目录中是否有 TODO/FIXME 标记 ──
 AGENT_TODOS=$(git diff --cached --name-only -- '.agent/' | xargs grep -n "TODO\|FIXME\|HACK\|XXX" 2>/dev/null || true)
 if [ -n "$AGENT_TODOS" ]; then
     echo ""
